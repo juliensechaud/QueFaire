@@ -1,0 +1,13 @@
+{
+  'version': 0,
+  'case-sensitive': 'false',
+  'roots': [{
+    'type': 'directory',
+    'name': '/Users/juliensechaud/Dropbox/_CREA_IPHONE/QueFaire/Build/Products/Debug-iphoneos/SFFocusViewLayout/SFFocusViewLayout.framework/Modules'
+    'contents': [{
+      'type': 'file',
+      'name': 'module.modulemap',
+      'external-contents': '/Users/juliensechaud/Dropbox/_CREA_IPHONE/QueFaire/Build/Intermediates/Pods.build/Debug-iphoneos/SFFocusViewLayout.build/unextended-module.modulemap',
+    }]
+  }]
+}

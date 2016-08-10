@@ -1,0 +1,11 @@
+version: "Apple Swift version 2.2 (swiftlang-703.0.18.8 clang-703.0.31)"
+options: "250f9833b3de9e61e8c775f5c123793e"
+build_time: [521471412, 955624000]
+inputs:
+  "/Users/juliensechaud/Dropbox/_CREA_IPHONE/QueFaire/QueFaire/DetailViewController.swift": [516647147, 0]
+  "/Users/juliensechaud/Dropbox/_CREA_IPHONE/QueFaire/QueFaire/MasterViewController.swift": [521441145, 0]
+  "/Users/juliensechaud/Dropbox/_CREA_IPHONE/QueFaire/QueFaire/AppDelegate.swift": [521439355, 0]
+  "/Users/juliensechaud/Dropbox/_CREA_IPHONE/QueFaire/QueFaire/UniversViewController.swift": [521441543, 0]
+  "/Users/juliensechaud/Dropbox/_CREA_IPHONE/QueFaire/QueFaire/WebViewController.swift": [521410635, 0]
+  "/Users/juliensechaud/Dropbox/_CREA_IPHONE/QueFaire/QueFaire/HomeCell.swift": [521425767, 0]
+  "/Users/juliensechaud/Dropbox/_CREA_IPHONE/QueFaire/QueFaire/ActivityViewController.swift": [521444728, 0]
