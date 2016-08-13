@@ -1,5 +1,0 @@
-version: "Apple Swift version 2.2 (swiftlang-703.0.18.8 clang-703.0.31)"
-options: "900bd05f6b1908d0c5feccb8677bfee3"
-build_time: [521471402, 820457000]
-inputs:
-  "/Users/juliensechaud/Dropbox/_CREA_IPHONE/QueFaire/Pods/SFFocusViewLayout/Source/SFFocusViewLayout.swift": [516718732, 0]

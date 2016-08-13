@@ -1,1 +1,0 @@
- const unsigned char SFFocusViewLayoutVersionString[] __attribute__ ((used)) = "@(#)PROGRAM:SFFocusViewLayout  PROJECT:Pods-1" "\n"; const double SFFocusViewLayoutVersionNumber __attribute__ ((used)) = (double)1.;
