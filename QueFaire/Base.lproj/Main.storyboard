@@ -450,7 +450,7 @@
                                 <segment title="Univers"/>
                                 <segment title="Catégorie"/>
                             </segments>
-                            <color key="tintColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <connections>
                                 <action selector="changeListing:" destination="Gvy-PC-BBF" eventType="valueChanged" id="iOT-50-kqX"/>
                             </connections>
