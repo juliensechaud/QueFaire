@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>615140D4-268B-4D6F-9FF1-1BDEC36A74E7</string>
+	<key>IDESourceControlProjectName</key>
+	<string>QueFaire</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>4D35765B2D3B2D3494E9CC1789AE7D2087663784</key>
+		<string>https://github.com/juliensechaud/QueFaire.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>QueFaire.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>4D35765B2D3B2D3494E9CC1789AE7D2087663784</key>
+		<string>..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/juliensechaud/QueFaire.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>4D35765B2D3B2D3494E9CC1789AE7D2087663784</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>4D35765B2D3B2D3494E9CC1789AE7D2087663784</string>
+			<key>IDESourceControlWCCName</key>
+			<string>QueFaire</string>
+		</dict>
+	</array>
+</dict>
+</plist>

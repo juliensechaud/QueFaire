@@ -11,54 +11,32 @@ import Alamofire
 import AlamofireImage
 import MDHTMLLabel
 import MapKit
+import Kingfisher
 
-extension String {
-    var htmlToString:String {
-        do {
-            let string = try NSAttributedString(data: dataUsingEncoding(NSUTF8StringEncoding)!, options: [NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType,NSCharacterEncodingDocumentAttribute:NSUTF8StringEncoding], documentAttributes: nil)
-            return string.string
-        } catch {
-            print("Error while parsing")
-            return String()
-        }
-    }
-    var htmlToNSAttributedString:NSAttributedString {
-        do {
-            let string = try NSAttributedString(data: dataUsingEncoding(NSUTF8StringEncoding)!, options: [NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType,NSCharacterEncodingDocumentAttribute:NSUTF8StringEncoding], documentAttributes: nil)
-            return string
-        } catch {
-            print("Error while parsing")
-            return NSAttributedString()
-        }
-    }
-}
 
 class MasterViewController: UITableViewController, UIPopoverPresentationControllerDelegate {
 
+    @IBOutlet weak var timeSegmentedControl: UISegmentedControl!
+    @IBOutlet weak var headerView: UIView!
     @IBOutlet weak var titleButton: UIButton!
-//    var detailViewController: DetailViewController? = nil
     struct Activities {
         var name: String?
         var description: String?
         
     }
+    let refreshActivity = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
+    var timeRefreshing: Bool = false
+    var daysToAdd: Double = 7.0;
     var objects = [AnyObject]()
     var loadingData = false
     var refreshPage:Int = 0
-    var univers: (id: Int, name: String, type: String) = (0, "Tous", "tag")
+    var univers: (id: Int, name: String, type: String) = (1, "Enfant", "tag")
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-//        self.navigationItem.leftBarButtonItem = self.editButtonItem()
-//
-//        let addButton = UIBarButtonItem(barButtonSystemItem: .Search, target: self, action: #selector(insertNewObject(_:)))
-//        self.navigationItem.rightBarButtonItem = addButton
-//        self.title = "Cette semaine"
-        
         if let split = self.splitViewController {
-            let controllers = split.viewControllers
-//            self.detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
+            _ = split.viewControllers
         }
         
         self.refreshControl?.addTarget(self, action: #selector(MasterViewController.fetchData), forControlEvents: UIControlEvents.ValueChanged)
@@ -67,31 +45,44 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         self.titleButton.titleLabel!.transform = CGAffineTransformScale(self.titleButton.titleLabel!.transform, -1.0, 1.0);
         self.titleButton.imageView!.transform = CGAffineTransformScale(self.titleButton.imageView!.transform, -1.0, 1.0);
 
+        self.tableView.tableHeaderView = headerView
+        timeSegmentedControl.tintColor = UIColorFromRGB(0xEFEFF4)
+        timeSegmentedControl.setTitleTextAttributes([NSForegroundColorAttributeName: UIColor.lightGrayColor()], forState: .Normal)
+        timeSegmentedControl.setTitleTextAttributes([NSForegroundColorAttributeName: UIColor.blackColor()], forState: .Selected)
         
         self.fetchData()
         
+        self.tableView.backgroundView = refreshActivity
+        refreshActivity.startAnimating()
     }
-    
-    
     
     func fetchData() -> Void {
         let otherType = self.univers.type == "cid" ? "tag" : "cid"
         let start = NSDate().timeIntervalSince1970
-        let daysToAdd: Double = 7.0;
         let end = NSDate().dateByAddingTimeInterval(60*60*24*daysToAdd).timeIntervalSince1970
 
-//        let stringRequest = "https://api.paris.fr/api/data/1.4/QueFaire/get_activities/?token=46cad19b4c01a8034d410d22a75d7400221fb84f7dd37791e55699b422de8914&cid=0&tag=1&created=0&start=1463402576&end=1463402576&offset=0&limit=10&created=1468091400"
         let stringRequest = "https://api.paris.fr/api/data/1.4/QueFaire/get_activities/?token=46cad19b4c01a8034d410d22a75d7400221fb84f7dd37791e55699b422de8914&\(otherType)=&\(self.univers.type)=\(String(self.univers.id))&created=&start=\(start)&end=\(end)&offset=\(self.refreshPage)&limit=10"
-//        let stringRequest = "https://api.paris.fr/api/data/1.4/QueFaire/get_activities/?token=46cad19b4c01a8034d410d22a75d7400221fb84f7dd37791e55699b422de8914&cid=0&tag=1&created=0&start=1483228800&end=1483228800&offset=0&limit=10"
+        
         print(stringRequest)
+        
         Alamofire.request(.GET, stringRequest, parameters: nil)
             .responseJSON { response in
                 if let JSON = response.result.value {
-                    self.objects += JSON.objectForKey("data") as! [AnyObject]
+                    guard let data = JSON.objectForKey("data") as? [AnyObject] else {
+                        return
+                    }
+                    self.objects += data
                     self.refreshPage += 10
                     self.loadingData = false
-                    self.tableView.reloadData()
+                    if self.timeRefreshing {
+                        self.tableView.reloadSections(NSIndexSet(index: 0), withRowAnimation: .None)
+                        self.timeRefreshing = false
+                    } else {
+                        self.tableView.reloadData()
+                    }
                     self.refreshControl?.endRefreshing()
+                } else {
+                    
                 }
         }
     }
@@ -106,14 +97,6 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         // Dispose of any resources that can be recreated.
     }
     
-    
-    func insertNewObject(sender: AnyObject) {
-        //self.presentViewController(<#T##viewControllerToPresent: UIViewController##UIViewController#>, animated: <#T##Bool#>, completion: <#T##(() -> Void)?##(() -> Void)?##() -> Void#>)
-//        objects.insert(NSDate(), atIndex: 0)
-        let indexPath = NSIndexPath(forRow: 0, inSection: 0)
-        self.tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-    }
-
     // MARK: - Segues
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -126,8 +109,6 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
                 backItem.title = ""
                 navigationItem.backBarButtonItem = backItem // This will show in the next view controller being pushed
 
-//                controller.navigationItem.leftBarButtonItem = self.splitViewController?.displayModeButtonItem()
-//                controller.navigationItem.leftItemsSupplementBackButton = true
             } else if let indexPath = Int((sender?.annotation!?.subtitle)!) {
                 let object = objects[indexPath]["idactivites"]
                 let controller = (segue.destinationViewController as! UINavigationController).topViewController as! ActivityViewController
@@ -167,12 +148,7 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         var nom = object["nom"] as! String
         nom.capitalizeFirstLetter()
         let lieu = object["lieu"] as! String
-        let small_description = object["small_description"] as? String
-        var discipline: String = ""
-        if (object["discipline"] == nil) {
-            discipline = object["discipline"] as! String
-        }
-        var nomLabel = (cell.contentView.viewWithTag(102) as! MDHTMLLabel)
+        let nomLabel = (cell.contentView.viewWithTag(102) as! MDHTMLLabel)
         nomLabel.htmlText = nom.htmlToString.htmlToString
         
         let hasFee = object["hasFee"] as? String
@@ -187,8 +163,8 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         
         (cell.contentView.viewWithTag(104) as! MDHTMLLabel).htmlText = lieu.htmlToString.htmlToString
 
-        var files = object["files"] as? [[String:String]] ?? object["media"] as? [[String:String]]
-        var path = "file"
+        let files = object["files"] as? [[String:String]] ?? object["media"] as? [[String:String]]
+        _ = "file"
         var surl: String = ""
         if files != nil {
             for file in files! {
@@ -199,34 +175,23 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
             }
             let link = surl
             if let name = link.componentsSeparatedByString("/").last {
-                let originalUrl = "original__\(name)"
+                _ = "original__\(name)"
                 let optiUrl = "x\(Int(self.tableView.frame.size.width))_\(name)"
                 let urlWithoutName = link.stringByReplacingOccurrencesOfString(name, withString: "")
-                let finalUrl = "http://filer.paris.fr/\(urlWithoutName)\(optiUrl)"
+                _ = "http://filer.paris.fr/\(urlWithoutName)\(optiUrl)"
             }
             
             let URL = NSURL(string: "http://filer.paris.fr/\(surl)")!
             let placeholderImage = UIImage(named: "placeholder")!
-            (cell.contentView.viewWithTag(101) as! UIImageView).af_setImageWithURL(URL, placeholderImage: placeholderImage)
-            //http://filer.paris.fr/quefaire/fiches/6/2/4/d/original__624d-viktor2010-27ph--jochen-viehoff.jpg
+            (cell.contentView.viewWithTag(101) as! UIImageView).kf_setImageWithURL(NSURL(string: "http://filer.paris.fr/\(surl)")!, placeholderImage: placeholderImage)
         }
         
         
         return cell
     }
-
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            objects.removeAtIndex(indexPath.row)
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
-        }
-    }
     
     override func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
         if !loadingData && indexPath.row == refreshPage - 1 {
-//            spinner.startAnimating()
             loadingData = true
             refreshResults2()
         }
@@ -259,7 +224,6 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
             dispatch_async(dispatch_get_main_queue()) {
                 // this runs on the main queue
                 self.fetchData()
-//                self.spinner.stopAnimating()
             }
         }
     }
@@ -271,12 +235,14 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         if let universViewController = segue.sourceViewController as? UniversViewController {
             guard universViewController.univers != nil else { return }
             self.univers = universViewController.univers!
-            self.title = "Cette semaine > \(self.univers.1)"
+            self.title = "\(self.univers.1)"
             self.refreshPage = 0
             self.objects.removeAll()
             self.tableView.reloadData()
             self.fetchData()
         }
+        guard let container = self.parentViewController as? ContainerViewController else { return }
+        container.buildTitleView()
     }
     
     func UIColorFromRGB(rgbValue: UInt) -> UIColor {
@@ -287,10 +253,54 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
             alpha: CGFloat(1.0)
         )
     }
-
+    
+    func refreshTime(time: Double) {
+        self.daysToAdd = time
+        self.refreshPage = 0
+        self.objects.removeAll()
+        self.tableView.reloadData()
+        timeRefreshing = true
+        self.fetchData()
+    }
+    @IBAction func timeSelected(sender: AnyObject) {
+        switch sender.selectedSegmentIndex {
+        case 0:
+            refreshTime(7)
+        case 1:
+            refreshTime(0)
+        case 2:
+            refreshTime(2)
+        default:
+            break;
+        }
+    }
+    
+    
     func adaptivePresentationStyleForPresentationController(controller: UIPresentationController) -> UIModalPresentationStyle {
         return .None
     }
 
+}
+
+
+extension String {
+    var htmlToString:String {
+        do {
+            let string = try NSAttributedString(data: dataUsingEncoding(NSUTF8StringEncoding)!, options: [NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType,NSCharacterEncodingDocumentAttribute:NSUTF8StringEncoding], documentAttributes: nil)
+            return string.string
+        } catch {
+            print("Error while parsing")
+            return String()
+        }
+    }
+    var htmlToNSAttributedString:NSAttributedString {
+        do {
+            let string = try NSAttributedString(data: dataUsingEncoding(NSUTF8StringEncoding)!, options: [NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType,NSCharacterEncodingDocumentAttribute:NSUTF8StringEncoding], documentAttributes: nil)
+            return string
+        } catch {
+            print("Error while parsing")
+            return NSAttributedString()
+        }
+    }
 }
 

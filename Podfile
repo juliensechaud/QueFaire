@@ -8,6 +8,7 @@ target 'QueFaire' do
   pod 'AlamofireImage', '~> 2.0'  
   pod 'SFFocusViewLayout'
   pod 'MDHTMLLabel'
+  pod 'Kingfisher', '~> 2.4'
 
 
   # Pods for QueFaire

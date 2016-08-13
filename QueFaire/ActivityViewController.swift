@@ -20,6 +20,8 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
     var eventStore = EKEventStore()
     var calendars: [EKCalendar]?
     var idActivity: Int = 0
+    
+    let refreshActivity = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
 
     var occurences: [[String:String]] = []
     var activity: [String:AnyObject] = [:] {
@@ -70,11 +72,14 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         manager.startUpdatingLocation()
         self.refreshControl = UIRefreshControl()
         self.refreshControl?.addTarget(self, action: #selector(ActivityViewController.fetchActivity(_:)), forControlEvents: UIControlEvents.ValueChanged)
+        
+        self.tableView.backgroundView = refreshActivity
+        refreshActivity.startAnimating()
     }
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        var eventStore = EKEventStore()
+        let eventStore = EKEventStore()
         
         eventStore.requestAccessToEntityType(.Reminder) { (granted, error) in
             

@@ -24,6 +24,8 @@
 		85AE9D241D31938E00771D6B /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85AE9D231D31938E00771D6B /* MapKit.framework */; };
 		85AE9D261D31CD0300771D6B /* HomeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AE9D251D31CD0300771D6B /* HomeCell.swift */; };
 		85AE9D281D31F70200771D6B /* UniversViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AE9D271D31F70200771D6B /* UniversViewController.swift */; };
+		85D4BAE41D5F5A27001BE54A /* ContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D4BAE31D5F5A27001BE54A /* ContainerViewController.swift */; };
+		85D4BAE61D5F6BC5001BE54A /* CustomPointAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D4BAE51D5F6BC5001BE54A /* CustomPointAnnotation.swift */; };
 		8B72FC5A774367EDC6AB581D /* Pods_QueFaireUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE647B93DE8075001EEBFACB /* Pods_QueFaireUITests.framework */; };
 /* End PBXBuildFile section */
 
@@ -70,6 +72,8 @@
 		85AE9D231D31938E00771D6B /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		85AE9D251D31CD0300771D6B /* HomeCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeCell.swift; sourceTree = "<group>"; };
 		85AE9D271D31F70200771D6B /* UniversViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UniversViewController.swift; sourceTree = "<group>"; };
+		85D4BAE31D5F5A27001BE54A /* ContainerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContainerViewController.swift; sourceTree = "<group>"; };
+		85D4BAE51D5F6BC5001BE54A /* CustomPointAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPointAnnotation.swift; sourceTree = "<group>"; };
 		9BD363B434C9FD564C442CD3 /* Pods-QueFaireUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QueFaireUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-QueFaireUITests/Pods-QueFaireUITests.release.xcconfig"; sourceTree = "<group>"; };
 		A403D25B3386343D23A6F61F /* Pods-QueFaire.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QueFaire.debug.xcconfig"; path = "Pods/Target Support Files/Pods-QueFaire/Pods-QueFaire.debug.xcconfig"; sourceTree = "<group>"; };
 		AC280121A68A137093B8B535 /* Pods_QueFaireTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_QueFaireTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -144,6 +148,8 @@
 				85A7746B1D3280BC0059A2D6 /* UniversCell.swift */,
 				85A7746F1D32995B0059A2D6 /* NSStringExtensions.swift */,
 				852BCDAA1D47A8A900E63615 /* MapViewController.swift */,
+				85D4BAE31D5F5A27001BE54A /* ContainerViewController.swift */,
+				85D4BAE51D5F6BC5001BE54A /* CustomPointAnnotation.swift */,
 			);
 			path = QueFaire;
 			sourceTree = "<group>";
@@ -455,7 +461,9 @@
 			files = (
 				85A7746C1D3280BC0059A2D6 /* UniversCell.swift in Sources */,
 				85542FCF1CE8E3EB000BD090 /* MasterViewController.swift in Sources */,
+				85D4BAE41D5F5A27001BE54A /* ContainerViewController.swift in Sources */,
 				85542FCD1CE8E3EB000BD090 /* AppDelegate.swift in Sources */,
+				85D4BAE61D5F6BC5001BE54A /* CustomPointAnnotation.swift in Sources */,
 				85A774701D32995B0059A2D6 /* NSStringExtensions.swift in Sources */,
 				852BCDAB1D47A8A900E63615 /* MapViewController.swift in Sources */,
 				85AE9D281D31F70200771D6B /* UniversViewController.swift in Sources */,
@@ -553,7 +561,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -579,8 +587,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Julien SECHAUD (P74YBR9XHW)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Julien SECHAUD (P74YBR9XHW)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -593,7 +600,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -606,14 +613,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = QueFaire/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = QueFaire;
+				PRODUCT_BUNDLE_IDENTIFIER = ma.QueFaire;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -623,14 +628,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = QueFaire/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = QueFaire;
+				PRODUCT_BUNDLE_IDENTIFIER = ma.QueFaire;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

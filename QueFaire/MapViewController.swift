@@ -24,7 +24,10 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.mapView.delegate = self
-        self.setUpMap()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
     }
     
     func setUpMap() {
@@ -32,10 +35,11 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         for (index, activity) in self.objects.enumerate() {
             let location = CLLocationCoordinate2DMake((activity["lat"] as? Double)!, (activity["lon"] as? Double)!)
             // Drop a pin
-            let dropPin = MKPointAnnotation()
+            let dropPin = CustomPointAnnotation()
             dropPin.coordinate = location
-            dropPin.title = activity["lieu"] as? String
-            dropPin.subtitle = String(index)
+            dropPin.title = (activity["nom"] as? String)?.htmlToString.htmlToString
+            dropPin.subtitle = (activity["lieu"] as? String)?.htmlToString.htmlToString
+            dropPin.tag = index
             mapView.addAnnotation(dropPin)
 //            mapView.centerCoordinate = location
         }
@@ -60,20 +64,21 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         let start = NSDate().timeIntervalSince1970
         let daysToAdd: Double = 7.0;
         let end = NSDate().dateByAddingTimeInterval(60*60*24*daysToAdd).timeIntervalSince1970
-        let type = self.context?.univers.type
-        let id = self.context?.univers.id
-        //        let stringRequest = "https://api.paris.fr/api/data/1.4/QueFaire/get_activities/?token=46cad19b4c01a8034d410d22a75d7400221fb84f7dd37791e55699b422de8914&cid=0&tag=1&created=0&start=1463402576&end=1463402576&offset=0&limit=10&created=1468091400"
-        let stringRequest = "https://api.paris.fr/api/data/1.4/QueFaire/get_geo_activities/?token=46cad19b4c01a8034d410d22a75d7400221fb84f7dd37791e55699b422de8914&\(otherType)=&\(type!)=\(id!)&created=&start=\(start)&end=\(end)&offset=0&limit=10&lat=\(region.center.latitude)&lon=\(region.center.longitude)&radius=3000"
-        //        let stringRequest = "https://api.paris.fr/api/data/1.4/QueFaire/get_activities/?token=46cad19b4c01a8034d410d22a75d7400221fb84f7dd37791e55699b422de8914&cid=0&tag=1&created=0&start=1483228800&end=1483228800&offset=0&limit=10"
+        let type = self.context?.univers.type ?? "tag"
+        var id: Int
+        if let universID = self.context?.univers.id {
+            id = universID
+        } else {
+            id = 0
+        }
+        let stringRequest = "https://api.paris.fr/api/data/1.4/QueFaire/get_geo_activities/?token=46cad19b4c01a8034d410d22a75d7400221fb84f7dd37791e55699b422de8914&\(otherType)=&\(type)=\(id)&created=&start=\(start)&end=\(end)&offset=0&limit=50&lat=\(region.center.latitude)&lon=\(region.center.longitude)&radius=100000"
         print(stringRequest)
         Alamofire.request(.GET, stringRequest, parameters: nil)
             .responseJSON { response in
                 if let JSON = response.result.value {
                     self.objects = JSON.objectForKey("data") as! [AnyObject]
-//                    self.refreshPage += 10
                     self.loadingData = false
                     self.setUpMap()
-//                    self.refreshControl?.endRefreshing()
                 }
         }
     }
@@ -94,20 +99,20 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     }
     
     func mapView(mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-        ((self.presentingViewController as? UISplitViewController)?.viewControllers[0] as? UINavigationController)?.topViewController!.performSegueWithIdentifier("showDetail", sender: view)
+        self.performSegueWithIdentifier("showDetailFromMap", sender: view)
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showDetailFromMap" {
-            if let indexPath = Int((sender?.annotation!?.subtitle)!) {
-                let object = objects[indexPath]["idactivites"]
-                let controller = (segue.destinationViewController as! UINavigationController).topViewController as! ActivityViewController
-                controller.detailItem = object as? Int
-                let backItem = UIBarButtonItem()
-                backItem.title = ""
-                navigationItem.backBarButtonItem = backItem // This will show in the next view controller being pushed
+            guard let annotation = sender?.annotation as? CustomPointAnnotation else { return }
+            let object = objects[annotation.tag]["idactivites"]
+            let controller = (segue.destinationViewController as! UINavigationController).topViewController as! ActivityViewController
+            controller.detailItem = object as? Int
+            let backItem = UIBarButtonItem()
+            backItem.title = ""
+            navigationItem.backBarButtonItem = backItem // This will show in the next view controller being pushed
                 
-            }
+            
         }
     }
 

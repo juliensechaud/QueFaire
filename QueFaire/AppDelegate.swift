@@ -23,19 +23,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         let navigationBarAppearace = UINavigationBar.appearance()
         
-<<<<<<< 279288fd5b8bcfe6d852cf4b4c7511221969bf08
         navigationBarAppearace.tintColor = UIColor.blackColor()
 ////        navigationBarAppearace.barTintColor = UIColorFromRGB(0xa1daf5)
 //        
-//        navigationBarAppearace.titleTextAttributes = [NSForegroundColorAttributeName:UIColor.blackColor(), NSFontAttributeName:UIFont(name: "Avenir-Light", size: 17)!]
-//        
-=======
-        navigationBarAppearace.tintColor = UIColor.whiteColor()
-        navigationBarAppearace.barTintColor = UIColorFromRGB(0xf96161)
+        navigationBarAppearace.titleTextAttributes = [NSForegroundColorAttributeName:UIColor.blackColor(), NSFontAttributeName:UIFont(name: "Avenir-Light", size: 17)!]
 //
-        navigationBarAppearace.titleTextAttributes = [NSForegroundColorAttributeName:UIColor.whiteColor(), NSFontAttributeName:UIFont(name: "Avenir-Light", size: 17)!]
-//
->>>>>>> certif ok and new color
 //        UIApplication.sharedApplication().statusBarStyle = .Default
         
         return true

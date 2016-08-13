@@ -18,6 +18,10 @@ class UniversViewController: UIViewController, UITableViewDelegate, UITableViewD
     var refreshControl: UIRefreshControl?
     var objects = [[String: AnyObject]]()
     var type: String = "get_univers"
+    
+    let refreshActivity = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
+    
+    var selectedIndexPath: NSIndexPath = NSIndexPath(forRow: 0, inSection: 0)
     @IBOutlet weak var tableView: UITableView!
     
     override func viewDidLoad() {
@@ -30,12 +34,15 @@ class UniversViewController: UIViewController, UITableViewDelegate, UITableViewD
         self.refreshControl = UIRefreshControl()
         self.refreshControl?.addTarget(self, action: #selector(self.fetchData(_:)), forControlEvents: UIControlEvents.ValueChanged)
 //        self.tableView.addSubview(self.refreshControl!)
+        
+        self.tableView.backgroundView = refreshActivity
+        refreshActivity.startAnimating()
 
     }
     
     
     func fetchData(type: String) -> Void {
-        let typeF = type ?? self.type
+        let _ = type ?? self.type
         let stringRequest = "https://api.paris.fr/api/data/1.0/QueFaire/\(type)/?token=46cad19b4c01a8034d410d22a75d7400221fb84f7dd37791e55699b422de8914"
         print(stringRequest)
         Alamofire.request(.GET, stringRequest, parameters: nil)
@@ -55,10 +62,11 @@ class UniversViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
-//        cell.backgroundColor = UIColor.blackColor()
-//        cell.textLabel?.textColor = UIColor.whiteColor()
         cell.textLabel?.font = UIFont(name: "Avenir-Light", size: 14)
         cell.textLabel?.text = self.objects[indexPath.row]["name"] as? String
+        if self.objects[indexPath.row]["id"] as? Int == univers?.0 {
+            selectedIndexPath = indexPath
+        }
         return cell
     }
     
@@ -66,6 +74,10 @@ class UniversViewController: UIViewController, UITableViewDelegate, UITableViewD
         let object = self.objects[indexPath.row]
         let type = self.segmentedControl.selectedSegmentIndex == 0 ? "tag" : "cid"
         self.univers = (object["id"] as! Int, object["name"] as! String, type)
+    }
+    
+    func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+        self.tableView.selectRowAtIndexPath(self.selectedIndexPath, animated: true, scrollPosition: .None)
     }
 
     @IBAction func changeListing(sender: AnyObject) {
@@ -79,6 +91,8 @@ class UniversViewController: UIViewController, UITableViewDelegate, UITableViewD
         self.fetchData(self.type)
         self.objects.removeAll()
     }
+    
+    
     
 //    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
 //        if segue.identifier == "FilterMaster" {

@@ -1,22 +1,25 @@
 PODS:
-  - Alamofire (3.4.0)
-  - AlamofireImage (2.4.0):
+  - Alamofire (3.4.1)
+  - AlamofireImage (2.4.1):
     - Alamofire (~> 3.3)
+  - Kingfisher (2.4.2)
   - MDHTMLLabel (1.0.2)
   - SFFocusViewLayout (3.0.0)
 
 DEPENDENCIES:
   - Alamofire (~> 3.4)
   - AlamofireImage (~> 2.0)
+  - Kingfisher (~> 2.4)
   - MDHTMLLabel
   - SFFocusViewLayout
 
 SPEC CHECKSUMS:
-  Alamofire: c19a627cefd6a95f840401c49ab1f124e07f54ee
-  AlamofireImage: 87408b652e0f5ae5fe364035f15aea8b9b24c77e
+  Alamofire: 01a82e2f6c0f860ade35534c8dd88be61bdef40c
+  AlamofireImage: 3ccf3347d9ea24580dc11fb892770a0be6a29826
+  Kingfisher: 05bf8d04408aaa70fcd2c8c81b9f1d0f1ad313dd
   MDHTMLLabel: 18bf09ec7d6c1ae396497345c005857c0493ee0a
   SFFocusViewLayout: 4766bec5d2214038526d5e03d08405f1f126688d
 
-PODFILE CHECKSUM: 82beb0e04b2cd035d1cc5c30b1680c1b1c9caeff
+PODFILE CHECKSUM: b74e1c44202a24dc6272e93de7f7fe7ad86d52d3
 
 COCOAPODS: 1.0.0
