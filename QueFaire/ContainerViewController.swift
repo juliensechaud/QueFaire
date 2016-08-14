@@ -30,11 +30,11 @@ class ContainerViewController: UIViewController {
         titleLabel.textAlignment = .Center
         titleLabel.numberOfLines = 0
         let attributedTitle = NSMutableAttributedString(string: NSBundle.mainBundle().infoDictionary!["CFBundleName"] as! String,
-                                                        attributes: [NSFontAttributeName : UIFont(name: "Avenir-Heavy", size: 15)!])
+                                                        attributes: [NSFontAttributeName : UIFont(name: "Avenir-Heavy", size: 15)!, NSForegroundColorAttributeName: UIColor.whiteColor()])
         
         if m.univers.name != "Master" {
             attributedTitle.appendAttributedString(NSAttributedString(string: "\n" + m.univers.name,
-                attributes: [NSForegroundColorAttributeName: UIColorFromRGB(0x7C7C7C),
+                attributes: [NSForegroundColorAttributeName: UIColor.whiteColor(),
                     NSFontAttributeName : UIFont(name: "Avenir-Roman", size: 11)!]))
         }
         

@@ -7,7 +7,7 @@
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Location is required to find out where you are</string>
 	<key>CFBundleDisplayName</key>
-	<string></string>
+	<string>KidsLoveParis</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Location is required to find out where you are</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
