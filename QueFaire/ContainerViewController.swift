@@ -29,7 +29,7 @@ class ContainerViewController: UIViewController {
         let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: 40))
         titleLabel.textAlignment = .Center
         titleLabel.numberOfLines = 0
-        let attributedTitle = NSMutableAttributedString(string: NSBundle.mainBundle().infoDictionary!["CFBundleName"] as! String,
+        let attributedTitle = NSMutableAttributedString(string: NSBundle.mainBundle().infoDictionary!["CFBundleDisplayName"] as! String,
                                                         attributes: [NSFontAttributeName : UIFont(name: "Avenir-Heavy", size: 15)!, NSForegroundColorAttributeName: UIColor.whiteColor()])
         
         if m.univers.name != "Master" {

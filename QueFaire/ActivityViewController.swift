@@ -12,14 +12,17 @@ import AlamofireImage
 import MDHTMLLabel
 import MapKit
 import EventKit
+import SafariServices
+import EventKitUI
 
-class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLocationManagerDelegate {
+class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLocationManagerDelegate, SFSafariViewControllerDelegate, EKEventEditViewDelegate {
     
     var manager: CLLocationManager!
     var location: CLLocation!
     var eventStore = EKEventStore()
     var calendars: [EKCalendar]?
     var idActivity: Int = 0
+    var savedEventId : String = ""
     
     let refreshActivity = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
 
@@ -79,65 +82,8 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        let eventStore = EKEventStore()
+    }
         
-        eventStore.requestAccessToEntityType(.Reminder) { (granted, error) in
-            
-        }
-
-    }
-    
-    func checkCalendarAuthorizationStatus() {
-        let status = EKEventStore.authorizationStatusForEntityType(EKEntityType.Event)
-        
-        switch (status) {
-        case EKAuthorizationStatus.NotDetermined:
-            // This happens on first-run
-            requestAccessToCalendar()
-        case EKAuthorizationStatus.Authorized:
-            // Things are in line with being able to show the calendars in the table view
-            loadCalendars()
-        case EKAuthorizationStatus.Restricted, EKAuthorizationStatus.Denied:
-            requestAccessToCalendar()
-            // We need to help them give us permission
-//            needPermissionView.fadeIn()
-        }
-    }
-    
-    func requestAccessToCalendar() {
-        self.eventStore.requestAccessToEntityType(EKEntityType.Reminder, completion:
-            {(granted, error) in
-                if !granted
-                {
-                    print("Access to store not granted")
-                }
-                else 
-                {
-                    print("Access granted")
-                }
-        })
-    }
-    
-    func loadCalendars() {
-        self.calendars = eventStore.calendarsForEntityType(EKEntityType.Event)
-    }
-    
-    func createEventStore() {
-        // 1
-        self.eventStore = EKEventStore()
-        self.eventStore.requestAccessToEntityType(EKEntityType.Reminder) { (granted: Bool, error: NSError?) -> Void in
-            
-            if granted{
-                // 2
-//                let predicate = self.eventStore.predicateForRemindersInCalendars(nil)
-//                self.eventStore.fetchRemindersMatchingPredicate(predicate, completion: { (reminders: [EKReminder]?) -> Void in
-//                })
-            }else{
-                print("The app is not permitted to access reminders, make sure to grant permission in the settings and try again")
-            }
-        }
-    }
-    
     func insertEvent(dateS: String) {
         let dateFormatter = NSDateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
@@ -173,13 +119,15 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         print(stringRequest)
         Alamofire.request(.GET, stringRequest, parameters: nil)
             .responseJSON { response in
-                if let JSON = response.result.value {
-                    let data = JSON["data"] as! [[String:AnyObject]]
-                    if data.count > 0 {
-                        self.activity = data[0]
+                    if let JSON = response.result.value {
+                        let data = JSON["data"] as! [[String:AnyObject]]
+                        if data.count > 0 {
+                            dispatch_async(dispatch_get_main_queue()) {
+                                self.activity = data[0]
+                                self.refreshControl?.endRefreshing()
+                            }
+                        }
                     }
-                }
-                self.refreshControl?.endRefreshing()
         }
     }
     
@@ -236,14 +184,70 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.section == 0 && indexPath.row == 4 {
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewControllerWithIdentifier("WebViewController") as! WebViewController
             let nom = (self.activity["nom"] as! String)+"+"+(self.activity["lieu"] as! String)
-
             let search = nom.stringByReplacingOccurrencesOfString(" ", withString: "+")
-            vc.url = NSURL(string: "https://www.google.fr/search?q=\(search)")
-            self.presentViewController(vc, animated: true, completion: nil)
+            
+            guard let url = NSURL(string: "https://www.google.fr/search?q=\(search)") else { return }
+            let sf = SFSafariViewController(URL: url)
+            sf.delegate = self
+            
+            self.presentViewController(sf, animated: true, completion: nil)
+            
+        } else if (indexPath.section == 1) {
+            addEvent(self.occurences[indexPath.row-1])
         }
+    }
+    
+    func addEvent(occurence: [String:String]) {
+        let eventStore = EKEventStore()
+        
+        guard occurence["jour"] != nil &&
+            occurence["hour_start"] != nil &&
+            occurence["hour_end"] != nil else { return }
+        
+        let start = occurence["jour"]?.stringByReplacingOccurrencesOfString("00:00:00", withString: occurence["hour_start"]!)
+        let end = occurence["jour"]?.stringByReplacingOccurrencesOfString("00:00:00", withString: occurence["hour_end"]!)
+        
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        dateFormatter.timeZone = NSTimeZone.localTimeZone()
+        dateFormatter.locale = NSLocale.currentLocale()
+        let startDate = dateFormatter.dateFromString(start!)
+        let endDate = dateFormatter.dateFromString(end!)
+        
+        let nom = activity["nom"] as? String
+
+        if (EKEventStore.authorizationStatusForEntityType(.Event) != EKAuthorizationStatus.Authorized) {
+            eventStore.requestAccessToEntityType(.Event, completion: {
+                granted, error in
+                self.createEvent(eventStore, title: nom!.htmlToString, startDate: startDate!, endDate: endDate!)
+            })
+        } else {
+            createEvent(eventStore, title: nom!.htmlToString, startDate: startDate!, endDate: endDate!)
+        }
+    }
+    
+    // Creates an event in the EKEventStore. The method assumes the eventStore is created and
+    // accessible
+    func createEvent(eventStore: EKEventStore, title: String, startDate: NSDate, endDate: NSDate) {
+        let event = EKEvent(eventStore: eventStore)
+        let nom = self.activity["nom"] as? String
+        event.title = nom!
+        event.startDate = startDate
+        event.endDate = endDate
+        event.calendar = eventStore.defaultCalendarForNewEvents
+
+        let ev = EKEventEditViewController()
+        ev.editViewDelegate = self
+        ev.eventStore = eventStore
+        ev.event = event
+        self.presentViewController(ev, animated: true, completion: nil)
+//        do {
+//            try eventStore.saveEvent(event, span: .ThisEvent)
+//            savedEventId = event.eventIdentifier
+//        } catch {
+//            print("Bad things happened")
+//        }
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -298,7 +302,16 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
             case 3:
                 cell = tableView.dequeueReusableCellWithIdentifier("descriptionCell", forIndexPath: indexPath)
                 cell.selectionStyle = .None
-                let description = self.activity["description"] as! String
+                var description = ""
+                if self.activity["accessType"] != nil {
+                    description += self.activity["accessType"] as! String
+                }
+                if self.activity["description"] != nil {
+                    description += self.activity["description"] as! String
+                }
+                if self.activity["price"] != nil {
+                    description += self.activity["price"] as! String
+                }
                 let label: MDHTMLLabel = (cell.contentView.viewWithTag(101) as! MDHTMLLabel)
                 label.highlightedShadowColor = UIColor.grayColor()
                 
@@ -401,6 +414,18 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         self.location = locations[0]
     }
     
+    //MARK: EKEventEditViewDelegate
+    
+    func eventEditViewController(controller: EKEventEditViewController, didCompleteWithAction action: EKEventEditViewAction) {
+        controller.dismissViewControllerAnimated(true, completion: {
+            if action == .Saved {
+                let nom = self.activity["nom"] as? String
+                let alert = UIAlertController(title: nom, message: "L'événement a bien été ajouté à votre calendrier", preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .Destructive, handler: nil))
+                self.presentViewController(alert, animated: true, completion: nil)
+            }
+        })
+    }
     
 }
 

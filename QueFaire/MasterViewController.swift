@@ -54,6 +54,7 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         
         self.tableView.backgroundView = refreshActivity
         refreshActivity.startAnimating()
+
     }
     
     func fetchData() -> Void {
@@ -74,22 +75,36 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
                     self.objects += data
                     self.refreshPage += 10
                     self.loadingData = false
-                    if self.timeRefreshing {
-                        self.tableView.reloadSections(NSIndexSet(index: 0), withRowAnimation: .None)
-                        self.timeRefreshing = false
-                    } else {
-                        self.tableView.reloadData()
+                    dispatch_async(dispatch_get_main_queue()) {
+                        if self.timeRefreshing {
+                            self.tableView.reloadSections(NSIndexSet(index: 0), withRowAnimation: .None)
+                            self.timeRefreshing = false
+                        } else {
+                            self.tableView.reloadData()
+                        }
+                        self.refreshControl?.endRefreshing()
                     }
-                    self.refreshControl?.endRefreshing()
                 } else {
                     
                 }
         }
     }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        let aVariable = appDelegate.deeplink
+        if aVariable == true {
+            self.performSegueWithIdentifier("showDetail", sender: appDelegate)
+        }
+
+    }
 
     override func viewWillAppear(animated: Bool) {
         self.clearsSelectionOnViewWillAppear = self.splitViewController!.collapsed
         super.viewWillAppear(animated)
+        
+
     }
 
     override func didReceiveMemoryWarning() {
@@ -109,14 +124,21 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
                 backItem.title = ""
                 navigationItem.backBarButtonItem = backItem // This will show in the next view controller being pushed
 
-            } else if let indexPath = Int((sender?.annotation!?.subtitle)!) {
-                let object = objects[indexPath]["idactivites"]
+//            } else if let indexPath = Int((sender?.annotation!?.subtitle)!) {
+//                let object = objects[indexPath]["idactivites"]
+//                let controller = (segue.destinationViewController as! UINavigationController).topViewController as! ActivityViewController
+//                controller.detailItem = object as? Int
+//                let backItem = UIBarButtonItem()
+//                backItem.title = ""
+//                navigationItem.backBarButtonItem = backItem // This will show in the next view controller being pushed
+//                
+            } else if sender is AppDelegate {
+                let object = Int((sender as! AppDelegate).idDeeplink)
                 let controller = (segue.destinationViewController as! UINavigationController).topViewController as! ActivityViewController
-                controller.detailItem = object as? Int
+                controller.detailItem = object
                 let backItem = UIBarButtonItem()
                 backItem.title = ""
                 navigationItem.backBarButtonItem = backItem // This will show in the next view controller being pushed
-                
             }
         } else if segue.identifier == "showMap" {
             let controller = (segue.destinationViewController as! UINavigationController).topViewController as! MapViewController
@@ -129,6 +151,10 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
             controller.popoverPresentationController?.permittedArrowDirections = .Up
             controller.popoverPresentationController?.delegate = self
         }
+    }
+    
+    func prepareActivitySegue() {
+        
     }
 
     // MARK: - Table View

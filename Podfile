@@ -9,6 +9,8 @@ target 'QueFaire' do
   pod 'SFFocusViewLayout'
   pod 'MDHTMLLabel'
   pod 'Kingfisher', '~> 2.4'
+  pod 'Batch', '~> 1.5.4'
+
 
 
   # Pods for QueFaire

@@ -7,12 +7,15 @@
 //
 
 import UIKit
+import Batch
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
     var window: UIWindow?
-
+    
+    var idDeeplink: String = ""
+    var deeplink: Bool = false
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
@@ -29,6 +32,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         navigationBarAppearace.titleTextAttributes = [NSForegroundColorAttributeName:UIColor.whiteColor(), NSFontAttributeName:UIFont(name: "Avenir-Light", size: 17)!]
 //
 //        UIApplication.sharedApplication().statusBarStyle = .Default
+        
+        // Start Batch.
+        // TODO : switch to live api key before store release
+        Batch.startWithAPIKey("DEV57B058EF8615EB9591209F0D35B") // dev
+        // Batch.startWithAPIKey("57B058EF7BCF055F613615EF34033A") // live
+        // Register for push notifications
+        BatchPush.registerForRemoteNotifications()
         
         return true
     }
@@ -63,6 +73,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    }
+    
+    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+        let splitViewController = self.window!.rootViewController as! UISplitViewController
+        let navigationController = splitViewController.viewControllers[splitViewController.viewControllers.count-1] as! UINavigationController
+        guard let master = (navigationController.viewControllers[0] as! ContainerViewController).masterVc else { return }
+        self.idDeeplink = BatchPush.deeplinkFromUserInfo(userInfo).stringByReplacingOccurrencesOfString("QueFaire?activity=", withString: "")
+        self.deeplink = true
+
+//        master.performSegueWithIdentifier("showDetail", sender: self)
     }
 
     // MARK: - Split view
