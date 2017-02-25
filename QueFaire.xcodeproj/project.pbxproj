@@ -209,6 +209,7 @@
 				85542FC71CE8E3EB000BD090 /* Resources */,
 				64A590AA37853307BD9F9737 /* 📦 Embed Pods Frameworks */,
 				1747A3165D49E98727063957 /* 📦 Copy Pods Resources */,
+				8557E2E31D68CE8500373BAE /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -427,6 +428,19 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-QueFaire/Pods-QueFaire-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		8557E2E31D68CE8500373BAE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Fabric/run\" 9ecf3e27aee2d2b0ab85fc4130e8592f1d6e2acf f7b7411e9f80e05bf7b8f19582d527facdb5d5f31c6d224672c16ed828da5731";
+		};
 		A53F587BC7F0057E1571DC89 /* 📦 Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -623,7 +637,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = QueFaire;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -638,7 +652,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = QueFaire;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

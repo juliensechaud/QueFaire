@@ -3,7 +3,10 @@ PODS:
   - AlamofireImage (2.4.1):
     - Alamofire (~> 3.3)
   - Batch (1.5.4)
-  - Kingfisher (2.4.2)
+  - Crashlytics (3.7.3):
+    - Fabric (~> 1.6.3)
+  - Fabric (1.6.8)
+  - Kingfisher (2.4.3)
   - MDHTMLLabel (1.0.2)
   - SFFocusViewLayout (3.0.0)
 
@@ -11,6 +14,8 @@ DEPENDENCIES:
   - Alamofire (~> 3.4)
   - AlamofireImage (~> 2.0)
   - Batch (~> 1.5.4)
+  - Crashlytics
+  - Fabric
   - Kingfisher (~> 2.4)
   - MDHTMLLabel
   - SFFocusViewLayout
@@ -19,10 +24,12 @@ SPEC CHECKSUMS:
   Alamofire: 01a82e2f6c0f860ade35534c8dd88be61bdef40c
   AlamofireImage: 3ccf3347d9ea24580dc11fb892770a0be6a29826
   Batch: 13083f81837fe1da9ea84b0533a2965c73ff74c6
-  Kingfisher: 05bf8d04408aaa70fcd2c8c81b9f1d0f1ad313dd
+  Crashlytics: 76f6beaff70acf226139582c09c78461597c2b98
+  Fabric: 5755268d0171435ab167e3d0878a28a777deaf10
+  Kingfisher: 322a9c1c5b03212c1e741d6bece72d387b01a77a
   MDHTMLLabel: 18bf09ec7d6c1ae396497345c005857c0493ee0a
   SFFocusViewLayout: 4766bec5d2214038526d5e03d08405f1f126688d
 
-PODFILE CHECKSUM: e358cdd9cab0d5bb48352801540b3e86ea403e38
+PODFILE CHECKSUM: 17f16caa0bbd271355a4bca17b1256cc1f636e31
 
 COCOAPODS: 1.0.0

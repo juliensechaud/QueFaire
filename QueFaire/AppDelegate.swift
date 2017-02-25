@@ -8,6 +8,9 @@
 
 import UIKit
 import Batch
+import Fabric
+import Crashlytics
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
@@ -35,10 +38,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         // Start Batch.
         // TODO : switch to live api key before store release
-        Batch.startWithAPIKey("DEV57B058EF8615EB9591209F0D35B") // dev
-        // Batch.startWithAPIKey("57B058EF7BCF055F613615EF34033A") // live
+//        Batch.startWithAPIKey("DEV57B058EF8615EB9591209F0D35B") // dev
+         Batch.startWithAPIKey("57B058EF7BCF055F613615EF34033A") // live
         // Register for push notifications
         BatchPush.registerForRemoteNotifications()
+        Fabric.with([Crashlytics.self])
+
         
         return true
     }
@@ -75,15 +80,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     
-    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
-        let splitViewController = self.window!.rootViewController as! UISplitViewController
-        let navigationController = splitViewController.viewControllers[splitViewController.viewControllers.count-1] as! UINavigationController
-        guard let master = (navigationController.viewControllers[0] as! ContainerViewController).masterVc else { return }
-        self.idDeeplink = BatchPush.deeplinkFromUserInfo(userInfo).stringByReplacingOccurrencesOfString("QueFaire?activity=", withString: "")
-        self.deeplink = true
-
-//        master.performSegueWithIdentifier("showDetail", sender: self)
-    }
+//    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+//        let splitViewController = self.window!.rootViewController as! UISplitViewController
+//        let navigationController = splitViewController.viewControllers[splitViewController.viewControllers.count-1] as! UINavigationController
+//        guard let master = (navigationController.viewControllers[0] as! ContainerViewController).masterVc else { return }
+//        self.idDeeplink = BatchPush.deeplinkFromUserInfo(userInfo).stringByReplacingOccurrencesOfString("QueFaire?activity=", withString: "")
+//        self.deeplink = true
+//
+////        master.performSegueWithIdentifier("showDetail", sender: self)
+//    }
 
     // MARK: - Split view
 

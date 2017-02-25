@@ -10,6 +10,8 @@ target 'QueFaire' do
   pod 'MDHTMLLabel'
   pod 'Kingfisher', '~> 2.4'
   pod 'Batch', '~> 1.5.4'
+  pod 'Fabric'
+  pod 'Crashlytics'
 
 
 
