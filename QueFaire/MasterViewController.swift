@@ -59,8 +59,9 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
     
     func fetchData() -> Void {
         let otherType = self.univers.type == "cid" ? "tag" : "cid"
-        let start = Date().timeIntervalSince1970
-        let end = Date().addingTimeInterval(60*60*24*daysToAdd).timeIntervalSince1970
+        let cal = Calendar(identifier: .gregorian)
+        let start = cal.startOfDay(for: Date()).timeIntervalSince1970
+        let end = cal.startOfDay(for: Date()).addingTimeInterval(60*60*24*daysToAdd).timeIntervalSince1970
 
         let stringRequest = "https://api.paris.fr/api/data/1.4/QueFaire/get_activities/?token=46cad19b4c01a8034d410d22a75d7400221fb84f7dd37791e55699b422de8914&\(otherType)=&\(self.univers.type)=\(String(self.univers.id))&created=&start=\(start)&end=\(end)&offset=\(self.refreshPage)&limit=10"
         
@@ -304,7 +305,7 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         case 0:
             refreshTime(7)
         case 1:
-            refreshTime(0)
+            refreshTime(1)
         case 2:
             refreshTime(2)
         default:

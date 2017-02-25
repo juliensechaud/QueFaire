@@ -43,7 +43,7 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
                         assert(false, "no date from string")
                         return false
                     }
-                    if date.numberOfDaysUntilDateTime(Date()) < 3 && date.numberOfDaysUntilDateTime(Date()) > -1000000 {
+                    if date.numberOfDaysUntilDateTime(Date()) < 60 && date.numberOfDaysUntilDateTime(Date()) > -1 {
                         return true
                     } else {
                         return false
@@ -337,14 +337,14 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
                 cell = tableView.dequeueReusableCell(withIdentifier: "descriptionCell", for: indexPath)
                 cell.selectionStyle = .none
                 var description = ""
-                if self.activity["accessType"] != nil {
-                    description += self.activity["accessType"] as! String
+                if let ac = self.activity["accessType"] as? String {
+                    description += ac
                 }
-                if self.activity["description"] != nil {
-                    description += self.activity["description"] as! String
+                if let ac = self.activity["description"] as? String {
+                    description += ac
                 }
-                if self.activity["price"] != nil {
-                    description += self.activity["price"] as! String
+                if let ac = self.activity["price"] as? String {
+                    description += ac
                 }
                 let label: MDHTMLLabel = (cell.contentView.viewWithTag(101) as! MDHTMLLabel)
                 label.highlightedShadowColor = UIColor.gray
@@ -417,10 +417,11 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
     }
     
     func htmlLabel(_ label: MDHTMLLabel!, didSelectLinkWith URL: Foundation.URL!) {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let vc = storyboard.instantiateViewController(withIdentifier: "WebViewController") as! WebViewController
-        vc.url = URL
-        self.present(vc, animated: true, completion: nil)
+        guard let url = URL else { return }
+        let sf = SFSafariViewController(url: url)
+        sf.delegate = self
+        
+        self.present(sf, animated: true, completion: nil)
     }
     
     func convertDateFormater(_ date: String) -> (String, Bool) {
@@ -435,7 +436,7 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
             return ("", today)
         }
         
-        if Date().numberOfDaysUntilDateTime(date) < 7 && Date().numberOfDaysUntilDateTime(date) > -1 {
+        if date.numberOfDaysUntilDateTime() < 7 && Date().numberOfDaysUntilDateTime() > -1 {
             today = true
         }
         
@@ -475,9 +476,9 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
 }
 
 extension Date {
-    func numberOfDaysUntilDateTime(_ toDateTime: Date, inTimeZone timeZone: TimeZone? = nil) -> Int {
+    func numberOfDaysUntilDateTime(_ toDateTime: Date? = nil, inTimeZone timeZone: TimeZone? = nil) -> Int {
         let calendar = NSCalendar.current
-        let components = calendar.dateComponents([.day], from: Date(), to: toDateTime)
+        let components = calendar.dateComponents([.day], from: Date(), to: self)
         return components.day!
     }
 }
