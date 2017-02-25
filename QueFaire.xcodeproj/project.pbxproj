@@ -17,6 +17,7 @@
 		85542FD91CE8E3EB000BD090 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 85542FD71CE8E3EB000BD090 /* LaunchScreen.storyboard */; };
 		85542FE41CE8E3EB000BD090 /* QueFaireTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85542FE31CE8E3EB000BD090 /* QueFaireTests.swift */; };
 		85542FEF1CE8E3EB000BD090 /* QueFaireUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85542FEE1CE8E3EB000BD090 /* QueFaireUITests.swift */; };
+		85911BEA1E61CDE9004386E0 /* KidsActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85911BE91E61CDE9004386E0 /* KidsActivityViewController.swift */; };
 		85A7746C1D3280BC0059A2D6 /* UniversCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A7746B1D3280BC0059A2D6 /* UniversCell.swift */; };
 		85A774701D32995B0059A2D6 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A7746F1D32995B0059A2D6 /* NSStringExtensions.swift */; };
 		85AE9D201D31711100771D6B /* ActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85AE9D1F1D31711100771D6B /* ActivityViewController.swift */; };
@@ -65,6 +66,7 @@
 		85542FEA1CE8E3EB000BD090 /* QueFaireUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QueFaireUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		85542FEE1CE8E3EB000BD090 /* QueFaireUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueFaireUITests.swift; sourceTree = "<group>"; };
 		85542FF01CE8E3EB000BD090 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		85911BE91E61CDE9004386E0 /* KidsActivityViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KidsActivityViewController.swift; sourceTree = "<group>"; };
 		85A7746B1D3280BC0059A2D6 /* UniversCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UniversCell.swift; sourceTree = "<group>"; };
 		85A7746F1D32995B0059A2D6 /* NSStringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSStringExtensions.swift; sourceTree = "<group>"; };
 		85AE9D1F1D31711100771D6B /* ActivityViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ActivityViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -143,6 +145,7 @@
 				85542FD71CE8E3EB000BD090 /* LaunchScreen.storyboard */,
 				85542FDA1CE8E3EB000BD090 /* Info.plist */,
 				85AE9D1F1D31711100771D6B /* ActivityViewController.swift */,
+				85911BE91E61CDE9004386E0 /* KidsActivityViewController.swift */,
 				85AE9D211D31897B00771D6B /* WebViewController.swift */,
 				85AE9D251D31CD0300771D6B /* HomeCell.swift */,
 				85A7746B1D3280BC0059A2D6 /* UniversCell.swift */,
@@ -505,6 +508,7 @@
 				85A774701D32995B0059A2D6 /* NSStringExtensions.swift in Sources */,
 				852BCDAB1D47A8A900E63615 /* MapViewController.swift in Sources */,
 				85AE9D281D31F70200771D6B /* UniversViewController.swift in Sources */,
+				85911BEA1E61CDE9004386E0 /* KidsActivityViewController.swift in Sources */,
 				85AE9D221D31897B00771D6B /* WebViewController.swift in Sources */,
 				85AE9D261D31CD0300771D6B /* HomeCell.swift in Sources */,
 				85AE9D201D31711100771D6B /* ActivityViewController.swift in Sources */,

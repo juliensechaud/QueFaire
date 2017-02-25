@@ -31,7 +31,7 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         didSet {
             // Update the tableView.
             let nom = activity["nom"] as? String
-            self.title = nom?.htmlToString.htmlToString
+            self.title = nom?.html2String.html2String
             if let occurencesA = activity["occurences"] as? [[String:String]] {
                 self.occurences = occurencesA.filter({ (occurence) -> Bool in
                     let dateFormatter = DateFormatter()
@@ -123,7 +123,7 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
                         let data = JSON["data"] as! [[String:AnyObject]]
                         if data.count > 0 {
                             DispatchQueue.main.async {
-                                self.activity = data[0]
+                                self.activity = self.make(forModel: data[0])
                                 self.refreshControl?.endRefreshing()
                             }
                         }
@@ -131,14 +131,46 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         }
     }
     
-    func buildPicUrl() -> URL {
-        var files = self.activity["media"] as? [[String:String]]
+    func make(forModel model: [String: AnyObject]) -> [String: AnyObject] {
+        var temp = model
+        for key in ["nom", "lieu", "description", "metro", "price", "accessType", "description", "adresse", "zipcode", "city"] {
+            if var value = model[key] as? String {
+                value.capitalizeFirstLetter()
+                value = value.html2String.html2String
+                temp[key] = value as AnyObject?
+            }
+            temp["surl"] = buildPicUrl(forModel: model) as AnyObject?
+        }
+//            if let files = object["files"] as? [[String:String]] ?? object["media"] as? [[String:String]] {
+//                _ = "file"
+//                var surl: String = ""
+//                for file in files {
+//                    let url: String = file["file"] ?? file["path"]!
+//                    if (url.contains("quefaire/fiches"))  {
+//                        surl = url
+//                    }
+//                }
+//                let link = surl
+//                if let name = link.components(separatedBy: "/").last {
+//                    _ = "original__\(name)"
+//                    let optiUrl = "x\(Int(self.tableView.frame.size.width))_\(name)"
+//                    let urlWithoutName = link.replacingOccurrences(of: name, with: "")
+//                    _ = "http://filer.paris.fr/\(urlWithoutName)\(optiUrl)"
+//                }
+//                temp2["surl"] = surl as AnyObject?
+//            }
+            
+        return temp
+    }
+    
+    func buildPicUrl(forModel model: [String: AnyObject]) -> String {
+        var files = model["media"] as? [[String:String]]
         var path = "path"
         var finalUrl = ""
         var surl: String = ""
         
         if files == nil {
-            files = self.activity["files"] as? [[String:String]]
+            files = model["files"] as? [[String:String]]
             path = "file"
         }
         
@@ -159,7 +191,7 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
             }
         }
         
-        return URL(string: finalUrl)!
+        return finalUrl
 
     }
     
@@ -220,10 +252,10 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         if (EKEventStore.authorizationStatus(for: .event) != EKAuthorizationStatus.authorized) {
             eventStore.requestAccess(to: .event, completion: {
                 granted, error in
-                self.createEvent(eventStore, title: nom!.htmlToString, startDate: startDate!, endDate: endDate!)
+                self.createEvent(eventStore, title: nom!.html2String, startDate: startDate!, endDate: endDate!)
             })
         } else {
-            createEvent(eventStore, title: nom!.htmlToString, startDate: startDate!, endDate: endDate!)
+            createEvent(eventStore, title: nom!.html2String, startDate: startDate!, endDate: endDate!)
         }
     }
     
@@ -258,7 +290,9 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
             case 0:
                 cell = tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath)
                 cell.selectionStyle = .none
-                (cell.contentView.viewWithTag(101) as! UIImageView).af_setImage(withURL: self.buildPicUrl(), placeholderImage: UIImage(named: "placeholder")!)
+                if let surl = self.activity["surl"] as? String, URL(string: surl) != nil {
+                    (cell.contentView.viewWithTag(101) as! UIImageView).af_setImage(withURL: URL(string: surl)!, placeholderImage: UIImage(named: "placeholder")!)
+                }
                 break
             case 1:
                 cell = tableView.dequeueReusableCell(withIdentifier: "titleCell", for: indexPath)
@@ -267,13 +301,13 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
                 nom.capitalizeFirstLetter()
                 var lieu = self.activity["lieu"] as! String
                 lieu.capitalizeFirstLetter()
-                (cell.contentView.viewWithTag(101) as! MDHTMLLabel).htmlText = nom.htmlToString.htmlToString
-                (cell.contentView.viewWithTag(102) as! MDHTMLLabel).htmlText = lieu.htmlToString.htmlToString
+                (cell.contentView.viewWithTag(101) as! MDHTMLLabel).htmlText = nom
+                (cell.contentView.viewWithTag(102) as! MDHTMLLabel).htmlText = lieu
                 (cell.contentView.viewWithTag(103) as! MDHTMLLabel).textInsets = UIEdgeInsets.init(top: 5, left: 5, bottom: 5, right: 5)
                 if hasFee == "0" {
-                    (cell.contentView.viewWithTag(103) as! MDHTMLLabel).htmlText = "Gratuit".htmlToString.htmlToString
+                    (cell.contentView.viewWithTag(103) as! MDHTMLLabel).htmlText = "Gratuit"
                 } else {
-                    (cell.contentView.viewWithTag(103) as! MDHTMLLabel).htmlText = "Payant".htmlToString.htmlToString
+                    (cell.contentView.viewWithTag(103) as! MDHTMLLabel).htmlText = "Payant"
                     (cell.contentView.viewWithTag(103) as! MDHTMLLabel).backgroundColor = UIColor.white
                 }
                 break
@@ -287,7 +321,7 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
                 (cell.contentView.viewWithTag(101) as! MDHTMLLabel).htmlText = String(format:"%.1f km", distance)
                 if hasFee == "1" {
                     if let prix = self.activity["prix"] as? String {
-                        (cell.contentView.viewWithTag(102) as! MDHTMLLabel).htmlText = prix.htmlToString.htmlToString.capitalized
+                        (cell.contentView.viewWithTag(102) as! MDHTMLLabel).htmlText = prix.capitalized
                     } else {
                         (cell.contentView.viewWithTag(102) as! MDHTMLLabel).htmlText = "Prix NC"
                     }
@@ -296,7 +330,7 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
                 if self.activity["metro"] != nil {
                     let metro = self.activity["metro"] as! String
                     let label: MDHTMLLabel = (cell.contentView.viewWithTag(103) as! MDHTMLLabel)
-                    label.htmlText = metro.htmlToString.htmlToString.capitalized
+                    label.htmlText = metro.capitalized
                 }
                 break
             case 3:
@@ -318,7 +352,7 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
                 label.activeLinkAttributes = [NSBackgroundColorAttributeName:UIColor.gray]
 
                 label.delegate = self
-                label.htmlText = description.htmlToString.htmlToString
+                label.htmlText = description
                 break
             case 4:
                 cell = tableView.dequeueReusableCell(withIdentifier: "googleCell", for: indexPath)
@@ -329,12 +363,14 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
                 cell = tableView.dequeueReusableCell(withIdentifier: "mapCell", for: indexPath)
                 cell.selectionStyle = .none
                 let mapView = (cell.contentView.viewWithTag(101) as! MKMapView)
-                self.createMap(mapView)
+                DispatchQueue.main.async {
+                    self.createMap(mapView)
+                }
                 let address = self.activity["adresse"] as! String
                 let zipcode = String(self.activity["zipcode"] as! Int)
                 let city = self.activity["city"] as! String
                 let addressLabel = (cell.contentView.viewWithTag(102) as! MDHTMLLabel)
-                addressLabel.htmlText = "\(address) \(zipcode) \(city)".htmlToString.htmlToString
+                addressLabel.htmlText = "\(address) \(zipcode) \(city)"
                 
                 break
             default:
@@ -427,19 +463,22 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         })
     }
     
+    @IBAction func shareActivity(_ sender: Any) {
+        let activityViewController = KidsActivityViewController(
+            activityItems: ["https://itunes.apple.com/fr/app/kids-love-paris-le-meilleur/id1143821447?mt=8"],
+            applicationActivities: nil)
+        if let popoverPresentationController = activityViewController.popoverPresentationController {
+            popoverPresentationController.barButtonItem = (sender as! UIBarButtonItem)
+        }
+        present(activityViewController, animated: true, completion: nil)
+    }
 }
 
 extension Date {
     func numberOfDaysUntilDateTime(_ toDateTime: Date, inTimeZone timeZone: TimeZone? = nil) -> Int {
-        var calendar = Calendar.current
-        if let timeZone = timeZone {
-            calendar.timeZone = timeZone
-        }
-        
-        var fromDate: Date?, toDate: Date?
-        
-        let date: TimeInterval = (toDate?.timeIntervalSince(fromDate!))!
-        return Int(date)/86400
+        let calendar = NSCalendar.current
+        let components = calendar.dateComponents([.day], from: Date(), to: toDateTime)
+        return components.day!
     }
 }
 

@@ -68,26 +68,59 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         
         Alamofire.request(stringRequest, headers: nil)
             .responseJSON { response in
-                if let JSON = response.result.value as? [String: AnyObject] {
-                    guard let data = JSON["data"] as? [AnyObject] else {
-                        return
-                    }
-                    self.objects += data
-                    self.refreshPage += 10
-                    self.loadingData = false
-                    DispatchQueue.main.async {
-                        if self.timeRefreshing {
-                            self.tableView.reloadSections(IndexSet(integer: 0), with: .none)
-                            self.timeRefreshing = false
-                        } else {
+                DispatchQueue.global(qos: .userInitiated).async {
+                    if let JSON = response.result.value as? [String: AnyObject] {
+                        guard let data = JSON["data"] as? [[String: AnyObject]] else {return}
+                        self.objects += self.make(forModel: data)
+                        self.refreshPage += 10
+                        self.loadingData = false
+                        DispatchQueue.main.async {
                             self.tableView.reloadData()
+                            self.refreshControl?.endRefreshing()
                         }
-                        self.refreshControl?.endRefreshing()
+                    } else {
+                        let warning = "TODO"
                     }
-                } else {
-                    
                 }
         }
+    }
+    
+    func make(forModel model: [[String: AnyObject]]) -> [AnyObject] {
+        var temp = [[String: AnyObject]]()
+        for object in model {
+            var temp2 = object
+            if var nom = object["nom"] as? String {
+                nom.capitalizeFirstLetter()
+                nom = nom.html2String.html2String
+                temp2["nom"] = nom as AnyObject?
+            }
+            if var lieu = object["lieu"] as? String {
+                lieu.capitalizeFirstLetter()
+                lieu = lieu.html2String.html2String
+                temp2["lieu"] = lieu as AnyObject?
+            }
+            if let files = object["files"] as? [[String:String]] ?? object["media"] as? [[String:String]] {
+                _ = "file"
+                var surl: String = ""
+                for file in files {
+                    let url: String = file["file"] ?? file["path"]!
+                    if (url.contains("quefaire/fiches"))  {
+                        surl = url
+                    }
+                }
+                let link = surl
+                if let name = link.components(separatedBy: "/").last {
+                    _ = "original__\(name)"
+                    let optiUrl = "x\(Int(self.tableView.frame.size.width))_\(name)"
+                    let urlWithoutName = link.replacingOccurrences(of: name, with: "")
+                    _ = "http://filer.paris.fr/\(urlWithoutName)\(optiUrl)"
+                }
+                temp2["surl"] = surl as AnyObject?
+            }
+
+            temp.append(temp2)
+        }
+        return temp as [AnyObject]
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -97,14 +130,11 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         if aVariable == true {
             self.performSegue(withIdentifier: "showDetail", sender: appDelegate)
         }
-
     }
 
     override func viewWillAppear(_ animated: Bool) {
         self.clearsSelectionOnViewWillAppear = self.splitViewController!.isCollapsed
         super.viewWillAppear(animated)
-        
-
     }
 
     override func didReceiveMemoryWarning() {
@@ -175,43 +205,24 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
         nom.capitalizeFirstLetter()
         let lieu = object["lieu"] as! String
         let nomLabel = (cell.contentView.viewWithTag(102) as! MDHTMLLabel)
-        nomLabel.htmlText = nom.htmlToString.htmlToString
+        nomLabel.htmlText = nom//.html2String.html2String
         
         let hasFee = object["hasFee"] as? String
         (cell.contentView.viewWithTag(103) as! MDHTMLLabel).textInsets = UIEdgeInsets.init(top: 5, left: 5, bottom: 5, right: 5)
         if hasFee == "0" {
-            (cell.contentView.viewWithTag(103) as! MDHTMLLabel).htmlText = "Gratuit".htmlToString.htmlToString
+            (cell.contentView.viewWithTag(103) as! MDHTMLLabel).htmlText = "Gratuit"
             (cell.contentView.viewWithTag(103) as! MDHTMLLabel).backgroundColor = UIColorFromRGB(0xbdf5c8)
         } else {
-            (cell.contentView.viewWithTag(103) as! MDHTMLLabel).htmlText = "Payant".htmlToString.htmlToString
+            (cell.contentView.viewWithTag(103) as! MDHTMLLabel).htmlText = "Payant"
             (cell.contentView.viewWithTag(103) as! MDHTMLLabel).backgroundColor = UIColor.white
         }
         
-        (cell.contentView.viewWithTag(104) as! MDHTMLLabel).htmlText = lieu.htmlToString.htmlToString
-
-        let files = object["files"] as? [[String:String]] ?? object["media"] as? [[String:String]]
-        _ = "file"
-        var surl: String = ""
-        if files != nil {
-            for file in files! {
-                let url: String = file["file"] ?? file["path"]!
-                if (url.contains("quefaire/fiches"))  {
-                    surl = url
-                }
-            }
-            let link = surl
-            if let name = link.components(separatedBy: "/").last {
-                _ = "original__\(name)"
-                let optiUrl = "x\(Int(self.tableView.frame.size.width))_\(name)"
-                let urlWithoutName = link.replacingOccurrences(of: name, with: "")
-                _ = "http://filer.paris.fr/\(urlWithoutName)\(optiUrl)"
-            }
-            
-            let URL = Foundation.URL(string: "http://filer.paris.fr/\(surl)")!
+        (cell.contentView.viewWithTag(104) as! MDHTMLLabel).htmlText = lieu//.html2String.html2String
+        
+        if let surl = object["surl"] as? String {
             let placeholderImage = UIImage(named: "placeholder")!
             (cell.contentView.viewWithTag(101) as! UIImageView).af_setImage(withURL: Foundation.URL(string: "http://filer.paris.fr/\(surl)")!, placeholderImage: placeholderImage)
         }
-        
         
         return cell
     }
@@ -310,23 +321,17 @@ class MasterViewController: UITableViewController, UIPopoverPresentationControll
 
 
 extension String {
-    var htmlToString:String {
+    var html2AttributedString: NSAttributedString? {
+        guard let data = data(using: .utf8) else { return nil }
         do {
-            let string = try NSAttributedString(data: data(using: String.Encoding.utf8)!, options: [NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType,NSCharacterEncodingDocumentAttribute:String.Encoding.utf8], documentAttributes: nil)
-            return string.string
-        } catch {
-            print("Error while parsing")
-            return String()
+            return try NSAttributedString(data: data, options: [NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType, NSCharacterEncodingDocumentAttribute: String.Encoding.utf8.rawValue], documentAttributes: nil)
+        } catch let error as NSError {
+            print(error.localizedDescription)
+            return  nil
         }
     }
-    var htmlToNSAttributedString:NSAttributedString {
-        do {
-            let string = try NSAttributedString(data: data(using: String.Encoding.utf8)!, options: [NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType,NSCharacterEncodingDocumentAttribute:String.Encoding.utf8], documentAttributes: nil)
-            return string
-        } catch {
-            print("Error while parsing")
-            return NSAttributedString()
-        }
+    var html2String: String {
+        return html2AttributedString?.string ?? ""
     }
 }
 

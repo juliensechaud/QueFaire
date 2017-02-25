@@ -37,8 +37,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             // Drop a pin
             let dropPin = CustomPointAnnotation()
             dropPin.coordinate = location
-            dropPin.title = (activity["nom"] as? String)?.htmlToString.htmlToString
-            dropPin.subtitle = (activity["lieu"] as? String)?.htmlToString.htmlToString
+            dropPin.title = (activity["nom"] as? String)?.html2String.html2String
+            dropPin.subtitle = (activity["lieu"] as? String)?.html2String.html2String
             dropPin.tag = index
             mapView.addAnnotation(dropPin)
 //            mapView.centerCoordinate = location

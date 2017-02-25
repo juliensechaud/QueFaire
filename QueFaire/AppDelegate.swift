@@ -31,20 +31,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         navigationBarAppearace.tintColor = UIColor.white
         navigationBarAppearace.barTintColor = UIColorFromRGB(0xf96161)
-//
         navigationBarAppearace.titleTextAttributes = [NSForegroundColorAttributeName:UIColor.white, NSFontAttributeName:UIFont(name: "Avenir-Light", size: 17)!]
-//
-//        UIApplication.sharedApplication().statusBarStyle = .Default
+        
+        UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationController.self]).tintColor = .white
         
         // Start Batch.
-        // TODO : switch to live api key before store release
-        Batch.start(withAPIKey:"DEV57B058EF8615EB9591209F0D35B") // dev
-//         Batch.start(withAPIKey: "57B058EF7BCF055F613615EF34033A") // live
+        #if DEBUG
+            Batch.start(withAPIKey:"DEV57B058EF8615EB9591209F0D35B") // dev
+        #else
+            Batch.start(withAPIKey: "57B058EF7BCF055F613615EF34033A") // live
+        #endif
+    
         // Register for push notifications
         BatchPush.registerForRemoteNotifications()
         Fabric.with([Crashlytics.self])
 
-        
         return true
     }
     
