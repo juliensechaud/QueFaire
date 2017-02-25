@@ -17,8 +17,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     var originalDataLoaded = false
 
     @IBOutlet weak var mapView: MKMapView!
-    @IBAction func dismiss(sender: AnyObject) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+    @IBAction func dismiss(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     override func viewDidLoad() {
@@ -26,13 +26,13 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         self.mapView.delegate = self
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
     
     func setUpMap() {
         mapView.removeAnnotations(mapView.annotations)
-        for (index, activity) in self.objects.enumerate() {
+        for (index, activity) in self.objects.enumerated() {
             let location = CLLocationCoordinate2DMake((activity["lat"] as? Double)!, (activity["lon"] as? Double)!)
             // Drop a pin
             let dropPin = CustomPointAnnotation()
@@ -53,17 +53,17 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         }
     }
     
-    func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+    func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         if self.originalDataLoaded {
             self.fetchData(mapView.region)
         }
     }
     
-    func fetchData(region: MKCoordinateRegion) -> Void {
+    func fetchData(_ region: MKCoordinateRegion) -> Void {
         let otherType = self.context?.univers.type == "cid" ? "tag" : "cid"
-        let start = NSDate().timeIntervalSince1970
+        let start = Date().timeIntervalSince1970
         let daysToAdd: Double = 7.0;
-        let end = NSDate().dateByAddingTimeInterval(60*60*24*daysToAdd).timeIntervalSince1970
+        let end = Date().addingTimeInterval(60*60*24*daysToAdd).timeIntervalSince1970
         let type = self.context?.univers.type ?? "tag"
         var id: Int
         if let universID = self.context?.univers.id {
@@ -73,40 +73,40 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         }
         let stringRequest = "https://api.paris.fr/api/data/1.4/QueFaire/get_geo_activities/?token=46cad19b4c01a8034d410d22a75d7400221fb84f7dd37791e55699b422de8914&\(otherType)=&\(type)=\(id)&created=&start=\(start)&end=\(end)&offset=0&limit=50&lat=\(region.center.latitude)&lon=\(region.center.longitude)&radius=100000"
         print(stringRequest)
-        Alamofire.request(.GET, stringRequest, parameters: nil)
+        Alamofire.request(stringRequest, headers: nil)
             .responseJSON { response in
-                if let JSON = response.result.value {
-                    self.objects = JSON.objectForKey("data") as! [AnyObject]
+                if let JSON = response.result.value as? [String: AnyObject] {
+                    self.objects = JSON["data"] as! [AnyObject]
                     self.loadingData = false
                     self.setUpMap()
                 }
         }
     }
     
-    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         var annotationView: MKPinAnnotationView
-        if !annotation.isKindOfClass(MKUserLocation) {
+        if !annotation.isKind(of: MKUserLocation.self) {
             annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "loc")
             annotationView.canShowCallout = true
-            annotationView.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure)
+            annotationView.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
             return annotationView
         }
         return nil
     }
     
-    func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         
     }
     
-    func mapView(mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-        self.performSegueWithIdentifier("showDetailFromMap", sender: view)
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+        self.performSegue(withIdentifier: "showDetailFromMap", sender: view)
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetailFromMap" {
-            guard let annotation = sender?.annotation as? CustomPointAnnotation else { return }
+            guard let annotation = (sender as AnyObject).annotation as? CustomPointAnnotation else { return }
             let object = objects[annotation.tag]["idactivites"]
-            let controller = (segue.destinationViewController as! UINavigationController).topViewController as! ActivityViewController
+            let controller = (segue.destination as! UINavigationController).topViewController as! ActivityViewController
             controller.detailItem = object as? Int
             let backItem = UIBarButtonItem()
             backItem.title = ""

@@ -19,20 +19,20 @@ class UniversViewController: UIViewController, UITableViewDelegate, UITableViewD
     var objects = [[String: AnyObject]]()
     var type: String = "get_univers"
     
-    let refreshActivity = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
+    let refreshActivity = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     
-    var selectedIndexPath: NSIndexPath = NSIndexPath(forRow: 0, inSection: 0)
+    var selectedIndexPath: IndexPath = IndexPath(row: 0, section: 0)
     @IBOutlet weak var tableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView.separatorColor = UIColor.darkGrayColor()
-        cancelButton.setTitleTextAttributes([NSFontAttributeName:UIFont(name: "Avenir-Roman", size: 14)!], forState: .Normal)
-        filterButton.setTitleTextAttributes([NSFontAttributeName:UIFont(name: "Avenir-Roman", size: 14)!], forState: .Normal)
+        self.tableView.separatorColor = UIColor.darkGray
+        cancelButton.setTitleTextAttributes([NSFontAttributeName:UIFont(name: "Avenir-Roman", size: 14)!], for: UIControlState())
+        filterButton.setTitleTextAttributes([NSFontAttributeName:UIFont(name: "Avenir-Roman", size: 14)!], for: UIControlState())
         self.fetchData(type)
         self.tableView.tableFooterView = UIView()
         self.refreshControl = UIRefreshControl()
-        self.refreshControl?.addTarget(self, action: #selector(self.fetchData(_:)), forControlEvents: UIControlEvents.ValueChanged)
+        self.refreshControl?.addTarget(self, action: #selector(self.fetchData(_:)), for: UIControlEvents.valueChanged)
 //        self.tableView.addSubview(self.refreshControl!)
         
         self.tableView.backgroundView = refreshActivity
@@ -41,27 +41,27 @@ class UniversViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
     
     
-    func fetchData(type: String) -> Void {
-        let _ = type ?? self.type
+    func fetchData(_ type: String) -> Void {
+        let _ = type 
         let stringRequest = "https://api.paris.fr/api/data/1.0/QueFaire/\(type)/?token=46cad19b4c01a8034d410d22a75d7400221fb84f7dd37791e55699b422de8914"
         print(stringRequest)
-        Alamofire.request(.GET, stringRequest, parameters: nil)
+        Alamofire.request(stringRequest, headers: nil)
             .responseJSON { response in
                 if let JSON = response.result.value {
-                    guard let data = JSON.objectForKey("data") as? [[String: AnyObject]] else {return}
-                    self.objects.append(["id":0,"name":"Tous"])
+                    guard let data = (JSON as AnyObject).object(forKey: "data") as? [[String: AnyObject]] else {return}
+                    self.objects.append(["id":0 as AnyObject,"name":"Tous" as AnyObject])
                     self.objects += data
                     self.tableView.reloadData()
                 }
         }
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.objects.count > 0 ? self.objects.count : 0
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         cell.textLabel?.font = UIFont(name: "Avenir-Light", size: 14)
         cell.textLabel?.text = self.objects[indexPath.row]["name"] as? String
         if self.objects[indexPath.row]["id"] as? Int == univers?.0 {
@@ -70,17 +70,17 @@ class UniversViewController: UIViewController, UITableViewDelegate, UITableViewD
         return cell
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let object = self.objects[indexPath.row]
         let type = self.segmentedControl.selectedSegmentIndex == 0 ? "tag" : "cid"
         self.univers = (object["id"] as! Int, object["name"] as! String, type)
     }
     
-    func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-        self.tableView.selectRowAtIndexPath(self.selectedIndexPath, animated: true, scrollPosition: .None)
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        self.tableView.selectRow(at: self.selectedIndexPath, animated: true, scrollPosition: .none)
     }
 
-    @IBAction func changeListing(sender: AnyObject) {
+    @IBAction func changeListing(_ sender: AnyObject) {
         let seg = sender as! UISegmentedControl
         switch seg.selectedSegmentIndex {
         case 0:

@@ -14,7 +14,7 @@ class WebViewController: UIViewController, UIWebViewDelegate {
     
     @IBOutlet weak var closeButton: UIButton!
     
-    var url: NSURL? {
+    var url: URL? {
         didSet {
             // Fetch data
         }
@@ -22,23 +22,23 @@ class WebViewController: UIViewController, UIWebViewDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.webView.loadRequest(NSURLRequest(URL: url!))
+        self.webView.loadRequest(URLRequest(url: url!))
         
     }
     
-    func webViewDidFinishLoad(webView: UIWebView) {
-        UIView.animateWithDuration(0.6 ,
+    func webViewDidFinishLoad(_ webView: UIWebView) {
+        UIView.animate(withDuration: 0.6 ,
                                    animations: {
-                                    self.closeButton.transform = CGAffineTransformMakeScale(0.6, 0.6)
+                                    self.closeButton.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
             },
                                    completion: { finish in
-                                    UIView.animateWithDuration(0.6){
-                                        self.closeButton.transform = CGAffineTransformIdentity
-                                    }
+                                    UIView.animate(withDuration: 0.6, animations: {
+                                        self.closeButton.transform = CGAffineTransform.identity
+                                    })
         })
     }
     
-    @IBAction func dismiss(sender: AnyObject) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+    @IBAction func dismiss(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
 }

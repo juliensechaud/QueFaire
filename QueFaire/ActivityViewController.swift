@@ -24,7 +24,7 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
     var idActivity: Int = 0
     var savedEventId : String = ""
     
-    let refreshActivity = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
+    let refreshActivity = UIActivityIndicatorView(activityIndicatorStyle: .gray)
 
     var occurences: [[String:String]] = []
     var activity: [String:AnyObject] = [:] {
@@ -34,21 +34,21 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
             self.title = nom?.htmlToString.htmlToString
             if let occurencesA = activity["occurences"] as? [[String:String]] {
                 self.occurences = occurencesA.filter({ (occurence) -> Bool in
-                    let dateFormatter = NSDateFormatter()
+                    let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-                    dateFormatter.timeZone = NSTimeZone(name: "UTC")
-                    dateFormatter.locale = NSLocale(localeIdentifier: "fr_FR")
+                    dateFormatter.timeZone = TimeZone(identifier: "UTC")
+                    dateFormatter.locale = Locale(identifier: "fr_FR")
                     
-                    guard let date = dateFormatter.dateFromString(occurence["jour"]!) else {
+                    guard let date = dateFormatter.date(from: occurence["jour"]!) else {
                         assert(false, "no date from string")
                         return false
                     }
-                    if date.numberOfDaysUntilDateTime(NSDate()) < 3 && date.numberOfDaysUntilDateTime(NSDate()) > -1000000 {
+                    if date.numberOfDaysUntilDateTime(Date()) < 3 && date.numberOfDaysUntilDateTime(Date()) > -1000000 {
                         return true
                     } else {
                         return false
                     }
-                }).reverse()
+                }).reversed()
             }
             self.tableView.reloadData()
         }
@@ -74,25 +74,25 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         manager.desiredAccuracy = kCLLocationAccuracyBest
         manager.startUpdatingLocation()
         self.refreshControl = UIRefreshControl()
-        self.refreshControl?.addTarget(self, action: #selector(ActivityViewController.fetchActivity(_:)), forControlEvents: UIControlEvents.ValueChanged)
+        self.refreshControl?.addTarget(self, action: #selector(ActivityViewController.fetchActivity(_:)), for: UIControlEvents.valueChanged)
         
         self.tableView.backgroundView = refreshActivity
         refreshActivity.startAnimating()
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
         
-    func insertEvent(dateS: String) {
-        let dateFormatter = NSDateFormatter()
+    func insertEvent(_ dateS: String) {
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        dateFormatter.timeZone = NSTimeZone(name: "UTC")
-        dateFormatter.locale = NSLocale(localeIdentifier: "fr_FR")
+        dateFormatter.timeZone = TimeZone(identifier: "UTC")
+        dateFormatter.locale = Locale(identifier: "fr_FR")
         
-        let calendar = NSCalendar.currentCalendar()
-        let date = dateFormatter.dateFromString(dateS)
-        let components = calendar.components([.Year, .Month, .Day], fromDate: date!)
+        let calendar = Calendar.current
+        let date = dateFormatter.date(from: dateS)
+        let components = (calendar as NSCalendar).components([.year, .month, .day], from: date!)
         
         let reminder = EKReminder(eventStore: self.eventStore)
         reminder.title = self.activity["nom"] as! String
@@ -105,24 +105,24 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         reminder.calendar = self.eventStore.defaultCalendarForNewReminders()
         // 2
         do {
-            try self.eventStore.saveReminder(reminder, commit: true)
-            dismissViewControllerAnimated(true, completion: nil)
+            try self.eventStore.save(reminder, commit: true)
+            dismiss(animated: true, completion: nil)
         }catch{
             print("Error creating and saving new reminder : \(error)")
         }
     }
     
     
-    func fetchActivity(id: Int) {
-        let idF = id ?? self.idActivity
+    func fetchActivity(_ id: Int) {
+        let idF = id 
         let stringRequest = "https://api.paris.fr/api/data/1.5/QueFaire/get_activity/?token=46cad19b4c01a8034d410d22a75d7400221fb84f7dd37791e55699b422de8914&id=\(String(idF))"
         print(stringRequest)
-        Alamofire.request(.GET, stringRequest, parameters: nil)
+        Alamofire.request(stringRequest, headers: nil)
             .responseJSON { response in
-                    if let JSON = response.result.value {
+                    if let JSON = response.result.value as? [String:AnyObject] {
                         let data = JSON["data"] as! [[String:AnyObject]]
                         if data.count > 0 {
-                            dispatch_async(dispatch_get_main_queue()) {
+                            DispatchQueue.main.async {
                                 self.activity = data[0]
                                 self.refreshControl?.endRefreshing()
                             }
@@ -131,7 +131,7 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         }
     }
     
-    func buildPicUrl() -> NSURL {
+    func buildPicUrl() -> URL {
         var files = self.activity["media"] as? [[String:String]]
         var path = "path"
         var finalUrl = ""
@@ -146,30 +146,30 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
             for file in files! {
                 if file[path] != nil {
                     let url: String = file[path]!
-                    if (url.containsString("quefaire/fiches"))  {
+                    if (url.contains("quefaire/fiches"))  {
                         surl = url
                     }
                 }
             }
             let link = surl
-            if let name = link.componentsSeparatedByString("/").last {
+            if let name = link.components(separatedBy: "/").last {
                 let optiUrl = "x\(Int(self.tableView.frame.size.width))_\(name)"
-                let urlWithoutName = link.stringByReplacingOccurrencesOfString(name, withString: "")
+                let urlWithoutName = link.replacingOccurrences(of: name, with: "")
                 finalUrl = "\(urlWithoutName)\(optiUrl)"
             }
         }
         
-        return NSURL(string: finalUrl)!
+        return URL(string: finalUrl)!
 
     }
     
     // MARK: - Table View
     
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         return 1 + (self.occurences.count > 0 ? 1 : 0)
     }
     
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var number: Int = 0
         switch section {
         case 0:
@@ -182,43 +182,43 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         return number
     }
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 && indexPath.row == 4 {
             let nom = (self.activity["nom"] as! String)+"+"+(self.activity["lieu"] as! String)
-            let search = nom.stringByReplacingOccurrencesOfString(" ", withString: "+")
+            let search = nom.replacingOccurrences(of: " ", with: "+")
             
-            guard let url = NSURL(string: "https://www.google.fr/search?q=\(search)") else { return }
-            let sf = SFSafariViewController(URL: url)
+            guard let url = URL(string: "https://www.google.fr/search?q=\(search)") else { return }
+            let sf = SFSafariViewController(url: url)
             sf.delegate = self
             
-            self.presentViewController(sf, animated: true, completion: nil)
+            self.present(sf, animated: true, completion: nil)
             
         } else if (indexPath.section == 1) {
             addEvent(self.occurences[indexPath.row-1])
         }
     }
     
-    func addEvent(occurence: [String:String]) {
+    func addEvent(_ occurence: [String:String]) {
         let eventStore = EKEventStore()
         
         guard occurence["jour"] != nil &&
             occurence["hour_start"] != nil &&
             occurence["hour_end"] != nil else { return }
         
-        let start = occurence["jour"]?.stringByReplacingOccurrencesOfString("00:00:00", withString: occurence["hour_start"]!)
-        let end = occurence["jour"]?.stringByReplacingOccurrencesOfString("00:00:00", withString: occurence["hour_end"]!)
+        let start = occurence["jour"]?.replacingOccurrences(of: "00:00:00", with: occurence["hour_start"]!)
+        let end = occurence["jour"]?.replacingOccurrences(of: "00:00:00", with: occurence["hour_end"]!)
         
-        let dateFormatter = NSDateFormatter()
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        dateFormatter.timeZone = NSTimeZone.localTimeZone()
-        dateFormatter.locale = NSLocale.currentLocale()
-        let startDate = dateFormatter.dateFromString(start!)
-        let endDate = dateFormatter.dateFromString(end!)
+        dateFormatter.timeZone = TimeZone.autoupdatingCurrent
+        dateFormatter.locale = Locale.current
+        let startDate = dateFormatter.date(from: start!)
+        let endDate = dateFormatter.date(from: end!)
         
         let nom = activity["nom"] as? String
 
-        if (EKEventStore.authorizationStatusForEntityType(.Event) != EKAuthorizationStatus.Authorized) {
-            eventStore.requestAccessToEntityType(.Event, completion: {
+        if (EKEventStore.authorizationStatus(for: .event) != EKAuthorizationStatus.authorized) {
+            eventStore.requestAccess(to: .event, completion: {
                 granted, error in
                 self.createEvent(eventStore, title: nom!.htmlToString, startDate: startDate!, endDate: endDate!)
             })
@@ -229,7 +229,7 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
     
     // Creates an event in the EKEventStore. The method assumes the eventStore is created and
     // accessible
-    func createEvent(eventStore: EKEventStore, title: String, startDate: NSDate, endDate: NSDate) {
+    func createEvent(_ eventStore: EKEventStore, title: String, startDate: Date, endDate: Date) {
         let event = EKEvent(eventStore: eventStore)
         let nom = self.activity["nom"] as? String
         event.title = nom!
@@ -241,7 +241,7 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         ev.editViewDelegate = self
         ev.eventStore = eventStore
         ev.event = event
-        self.presentViewController(ev, animated: true, completion: nil)
+        self.present(ev, animated: true, completion: nil)
 //        do {
 //            try eventStore.saveEvent(event, span: .ThisEvent)
 //            savedEventId = event.eventIdentifier
@@ -250,19 +250,19 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
 //        }
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        var cell: UITableViewCell = UITableViewCell(style: .Default, reuseIdentifier: "Cell")
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        var cell: UITableViewCell = UITableViewCell(style: .default, reuseIdentifier: "Cell")
         if indexPath.section == 0 {
             let hasFee = self.activity["hasFee"] as! String
             switch indexPath.row {
             case 0:
-                cell = tableView.dequeueReusableCellWithIdentifier("imageCell", forIndexPath: indexPath)
-                cell.selectionStyle = .None
-                (cell.contentView.viewWithTag(101) as! UIImageView).af_setImageWithURL(self.buildPicUrl(), placeholderImage: UIImage(named: "placeholder")!)
+                cell = tableView.dequeueReusableCell(withIdentifier: "imageCell", for: indexPath)
+                cell.selectionStyle = .none
+                (cell.contentView.viewWithTag(101) as! UIImageView).af_setImage(withURL: self.buildPicUrl(), placeholderImage: UIImage(named: "placeholder")!)
                 break
             case 1:
-                cell = tableView.dequeueReusableCellWithIdentifier("titleCell", forIndexPath: indexPath)
-                cell.selectionStyle = .None
+                cell = tableView.dequeueReusableCell(withIdentifier: "titleCell", for: indexPath)
+                cell.selectionStyle = .none
                 var nom = self.activity["nom"] as! String
                 nom.capitalizeFirstLetter()
                 var lieu = self.activity["lieu"] as! String
@@ -274,20 +274,20 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
                     (cell.contentView.viewWithTag(103) as! MDHTMLLabel).htmlText = "Gratuit".htmlToString.htmlToString
                 } else {
                     (cell.contentView.viewWithTag(103) as! MDHTMLLabel).htmlText = "Payant".htmlToString.htmlToString
-                    (cell.contentView.viewWithTag(103) as! MDHTMLLabel).backgroundColor = UIColor.whiteColor()
+                    (cell.contentView.viewWithTag(103) as! MDHTMLLabel).backgroundColor = UIColor.white
                 }
                 break
             case 2:
-                cell = tableView.dequeueReusableCellWithIdentifier("detailCell", forIndexPath: indexPath)
-                cell.selectionStyle = .None
+                cell = tableView.dequeueReusableCell(withIdentifier: "detailCell", for: indexPath)
+                cell.selectionStyle = .none
                 let lat : CLLocationDegrees = self.activity["lat"] as! Double
                 let lon : CLLocationDegrees = self.activity["lon"] as! Double
                 let location = self.location ?? CLLocation(latitude: lat, longitude: lon)
-                let distance = location.distanceFromLocation(CLLocation(latitude: lat, longitude: lon))/1000
+                let distance = location.distance(from: CLLocation(latitude: lat, longitude: lon))/1000
                 (cell.contentView.viewWithTag(101) as! MDHTMLLabel).htmlText = String(format:"%.1f km", distance)
                 if hasFee == "1" {
                     if let prix = self.activity["prix"] as? String {
-                        (cell.contentView.viewWithTag(102) as! MDHTMLLabel).htmlText = prix.htmlToString.htmlToString.capitalizedString
+                        (cell.contentView.viewWithTag(102) as! MDHTMLLabel).htmlText = prix.htmlToString.htmlToString.capitalized
                     } else {
                         (cell.contentView.viewWithTag(102) as! MDHTMLLabel).htmlText = "Prix NC"
                     }
@@ -296,12 +296,12 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
                 if self.activity["metro"] != nil {
                     let metro = self.activity["metro"] as! String
                     let label: MDHTMLLabel = (cell.contentView.viewWithTag(103) as! MDHTMLLabel)
-                    label.htmlText = metro.htmlToString.htmlToString.capitalizedString
+                    label.htmlText = metro.htmlToString.htmlToString.capitalized
                 }
                 break
             case 3:
-                cell = tableView.dequeueReusableCellWithIdentifier("descriptionCell", forIndexPath: indexPath)
-                cell.selectionStyle = .None
+                cell = tableView.dequeueReusableCell(withIdentifier: "descriptionCell", for: indexPath)
+                cell.selectionStyle = .none
                 var description = ""
                 if self.activity["accessType"] != nil {
                     description += self.activity["accessType"] as! String
@@ -313,21 +313,21 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
                     description += self.activity["price"] as! String
                 }
                 let label: MDHTMLLabel = (cell.contentView.viewWithTag(101) as! MDHTMLLabel)
-                label.highlightedShadowColor = UIColor.grayColor()
+                label.highlightedShadowColor = UIColor.gray
                 
-                label.activeLinkAttributes = [NSBackgroundColorAttributeName:UIColor.grayColor()]
+                label.activeLinkAttributes = [NSBackgroundColorAttributeName:UIColor.gray]
 
                 label.delegate = self
                 label.htmlText = description.htmlToString.htmlToString
                 break
             case 4:
-                cell = tableView.dequeueReusableCellWithIdentifier("googleCell", forIndexPath: indexPath)
+                cell = tableView.dequeueReusableCell(withIdentifier: "googleCell", for: indexPath)
                 cell.textLabel?.font = UIFont(name: "Avenir-Light", size: 14)
                 cell.textLabel?.text = "Lancer une recherche sur le sujet"
                 break
             case 5:
-                cell = tableView.dequeueReusableCellWithIdentifier("mapCell", forIndexPath: indexPath)
-                cell.selectionStyle = .None
+                cell = tableView.dequeueReusableCell(withIdentifier: "mapCell", for: indexPath)
+                cell.selectionStyle = .none
                 let mapView = (cell.contentView.viewWithTag(101) as! MKMapView)
                 self.createMap(mapView)
                 let address = self.activity["adresse"] as! String
@@ -347,10 +347,10 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
                 cell.textLabel?.text = "Horaires"
             } else {
                 let (jour, today) = self.convertDateFormater(self.occurences[indexPath.row-1]["jour"]!)
-                let start = self.occurences[indexPath.row-1]["hour_start"]!.stringByReplacingOccurrencesOfString(":00:00", withString: "h").stringByReplacingOccurrencesOfString(":00", withString: "").stringByReplacingOccurrencesOfString(":", withString: "h")
-                let end = self.occurences[indexPath.row-1]["hour_end"]!.stringByReplacingOccurrencesOfString(":00:00", withString: "h").stringByReplacingOccurrencesOfString(":00", withString: "").stringByReplacingOccurrencesOfString(":", withString: "h")
+                let start = self.occurences[indexPath.row-1]["hour_start"]!.replacingOccurrences(of: ":00:00", with: "h").replacingOccurrences(of: ":00", with: "").replacingOccurrences(of: ":", with: "h")
+                let end = self.occurences[indexPath.row-1]["hour_end"]!.replacingOccurrences(of: ":00:00", with: "h").replacingOccurrences(of: ":00", with: "").replacingOccurrences(of: ":", with: "h")
                 if today {
-                    cell.backgroundColor = UIColor.groupTableViewBackgroundColor()
+                    cell.backgroundColor = UIColor.groupTableViewBackground
                 }
                 cell.textLabel?.font = UIFont(name: "Avenir-Light", size: 14)
                 cell.textLabel?.text = "\(jour) de \(start) à \(end)"
@@ -360,13 +360,13 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         return cell
     }
     
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
     
     
-    func createMap(mapView: MKMapView) {
+    func createMap(_ mapView: MKMapView) {
         let location = CLLocationCoordinate2DMake((self.activity["lat"] as? Double)!, (self.activity["lon"] as? Double)!)
         // Drop a pin
         let dropPin = MKPointAnnotation()
@@ -380,69 +380,66 @@ class ActivityViewController: UITableViewController, MDHTMLLabelDelegate, CLLoca
         mapView.setRegion(adjustedRegion, animated: true)
     }
     
-    func HTMLLabel(label: MDHTMLLabel!, didSelectLinkWithURL URL: NSURL!) {
+    func htmlLabel(_ label: MDHTMLLabel!, didSelectLinkWith URL: Foundation.URL!) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let vc = storyboard.instantiateViewControllerWithIdentifier("WebViewController") as! WebViewController
+        let vc = storyboard.instantiateViewController(withIdentifier: "WebViewController") as! WebViewController
         vc.url = URL
-        self.presentViewController(vc, animated: true, completion: nil)
+        self.present(vc, animated: true, completion: nil)
     }
     
-    func convertDateFormater(date: String) -> (String, Bool) {
-        let dateFormatter = NSDateFormatter()
+    func convertDateFormater(_ date: String) -> (String, Bool) {
+        let dateFormatter = DateFormatter()
         var today: Bool = false
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        dateFormatter.timeZone = NSTimeZone(name: "UTC")
-        dateFormatter.locale = NSLocale(localeIdentifier: "fr_FR")
+        dateFormatter.timeZone = TimeZone(identifier: "UTC")
+        dateFormatter.locale = Locale(identifier: "fr_FR")
         
-        guard let date = dateFormatter.dateFromString(date) else {
+        guard let date = dateFormatter.date(from: date) else {
             assert(false, "no date from string")
             return ("", today)
         }
         
-        if NSDate().numberOfDaysUntilDateTime(date) < 7 && NSDate().numberOfDaysUntilDateTime(date) > -1 {
+        if Date().numberOfDaysUntilDateTime(date) < 7 && Date().numberOfDaysUntilDateTime(date) > -1 {
             today = true
         }
         
         dateFormatter.dateFormat = "EE dd MMM yyyy"
-        dateFormatter.timeZone = NSTimeZone(name: "UTC")
-        let timeStamp = dateFormatter.stringFromDate(date)
+        dateFormatter.timeZone = TimeZone(identifier: "UTC")
+        let timeStamp = dateFormatter.string(from: date)
         
         return (timeStamp, today)
     }
     
-    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         self.location = locations[0]
     }
     
     //MARK: EKEventEditViewDelegate
     
-    func eventEditViewController(controller: EKEventEditViewController, didCompleteWithAction action: EKEventEditViewAction) {
-        controller.dismissViewControllerAnimated(true, completion: {
-            if action == .Saved {
+    func eventEditViewController(_ controller: EKEventEditViewController, didCompleteWith action: EKEventEditViewAction) {
+        controller.dismiss(animated: true, completion: {
+            if action == .saved {
                 let nom = self.activity["nom"] as? String
-                let alert = UIAlertController(title: nom, message: "L'événement a bien été ajouté à votre calendrier", preferredStyle: .Alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: .Destructive, handler: nil))
-                self.presentViewController(alert, animated: true, completion: nil)
+                let alert = UIAlertController(title: nom, message: "L'événement a bien été ajouté à votre calendrier", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: .destructive, handler: nil))
+                self.present(alert, animated: true, completion: nil)
             }
         })
     }
     
 }
 
-extension NSDate {
-    func numberOfDaysUntilDateTime(toDateTime: NSDate, inTimeZone timeZone: NSTimeZone? = nil) -> Int {
-        let calendar = NSCalendar.currentCalendar()
+extension Date {
+    func numberOfDaysUntilDateTime(_ toDateTime: Date, inTimeZone timeZone: TimeZone? = nil) -> Int {
+        var calendar = Calendar.current
         if let timeZone = timeZone {
             calendar.timeZone = timeZone
         }
         
-        var fromDate: NSDate?, toDate: NSDate?
+        var fromDate: Date?, toDate: Date?
         
-        calendar.rangeOfUnit(.Day, startDate: &fromDate, interval: nil, forDate: self)
-        calendar.rangeOfUnit(.Day, startDate: &toDate, interval: nil, forDate: toDateTime)
-        
-        let difference = calendar.components(.Day, fromDate: fromDate!, toDate: toDate!, options: [])
-        return difference.day
+        let date: TimeInterval = (toDate?.timeIntervalSince(fromDate!))!
+        return Int(date)/86400
     }
 }
 

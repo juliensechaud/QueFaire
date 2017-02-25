@@ -4,12 +4,12 @@
 target 'QueFaire' do
   # Comment this line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
-  pod 'Alamofire', '~> 3.4'
-  pod 'AlamofireImage', '~> 2.0'  
-  pod 'SFFocusViewLayout'
+  pod 'Alamofire', '~> 4.3'
+  pod 'AlamofireImage', '~> 3.1'
+  pod 'SFFocusViewLayout', '~> 3.0'
   pod 'MDHTMLLabel'
-  pod 'Kingfisher', '~> 2.4'
-  pod 'Batch', '~> 1.5.4'
+  pod 'Kingfisher'
+  pod 'Batch'
   pod 'Fabric'
   pod 'Crashlytics'
 

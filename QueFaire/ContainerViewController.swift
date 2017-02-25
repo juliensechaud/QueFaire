@@ -17,7 +17,7 @@ class ContainerViewController: UIViewController {
     @IBOutlet weak var mapContainer: UIView!
     
     override func viewDidLoad() {
-        rightBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .Plain, target: self, action: #selector(ContainerViewController.filterMaster))
+        rightBarButton = UIBarButtonItem(image: UIImage(named: "filter"), style: .plain, target: self, action: #selector(ContainerViewController.filterMaster))
         self.navigationItem.rightBarButtonItem = rightBarButton
         self.navigationItem.leftBarButtonItem?.action = #selector(ContainerViewController.switchContainer)
         self.navigationItem.leftBarButtonItem?.target = self
@@ -27,14 +27,14 @@ class ContainerViewController: UIViewController {
     func buildTitleView() {
         guard let m = masterVc else { return }
         let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: 40))
-        titleLabel.textAlignment = .Center
+        titleLabel.textAlignment = .center
         titleLabel.numberOfLines = 0
-        let attributedTitle = NSMutableAttributedString(string: NSBundle.mainBundle().infoDictionary!["CFBundleDisplayName"] as! String,
-                                                        attributes: [NSFontAttributeName : UIFont(name: "Avenir-Heavy", size: 15)!, NSForegroundColorAttributeName: UIColor.whiteColor()])
+        let attributedTitle = NSMutableAttributedString(string: Bundle.main.infoDictionary!["CFBundleDisplayName"] as! String,
+                                                        attributes: [NSFontAttributeName : UIFont(name: "Avenir-Heavy", size: 15)!, NSForegroundColorAttributeName: UIColor.white])
         
         if m.univers.name != "Master" {
-            attributedTitle.appendAttributedString(NSAttributedString(string: "\n" + m.univers.name,
-                attributes: [NSForegroundColorAttributeName: UIColor.whiteColor(),
+            attributedTitle.append(NSAttributedString(string: "\n" + m.univers.name,
+                attributes: [NSForegroundColorAttributeName: UIColor.white,
                     NSFontAttributeName : UIFont(name: "Avenir-Roman", size: 11)!]))
         }
         
@@ -43,7 +43,7 @@ class ContainerViewController: UIViewController {
 
     }
     
-    func UIColorFromRGB(rgbValue: UInt) -> UIColor {
+    func UIColorFromRGB(_ rgbValue: UInt) -> UIColor {
         return UIColor(
             red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
             green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
@@ -53,17 +53,17 @@ class ContainerViewController: UIViewController {
     }
 
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let backItem = UIBarButtonItem()
         backItem.title = ""
         navigationItem.backBarButtonItem = backItem // This will show in the next view controller being pushed
 
         if segue.identifier == "MasterContainer" {
-            masterVc = segue.destinationViewController as? MasterViewController
+            masterVc = segue.destination as? MasterViewController
         } else if segue.identifier == "MapContainer" {
-            mapVc = segue.destinationViewController as? MapViewController
+            mapVc = segue.destination as? MapViewController
         } else if segue.identifier == "FilterMaster" {
-            let universVc = (segue.destinationViewController as? UINavigationController)?.viewControllers[0] as? UniversViewController
+            let universVc = (segue.destination as? UINavigationController)?.viewControllers[0] as? UniversViewController
             universVc?.univers = masterVc?.univers
         }
     }
@@ -88,7 +88,7 @@ class ContainerViewController: UIViewController {
     }
     
     func filterMaster() {
-        self.performSegueWithIdentifier("FilterMaster", sender: self)
+        self.performSegue(withIdentifier: "FilterMaster", sender: self)
     }
 
 }

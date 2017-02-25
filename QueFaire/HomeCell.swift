@@ -13,7 +13,7 @@ class HomeCell: UITableViewCell {
     @IBOutlet weak var sImageView: UIImageView!
     @IBOutlet weak var cacheView: UIView!
     
-    override func setHighlighted(highlighted: Bool, animated: Bool) {
+    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         if highlighted {
             self.sImageView.alpha = 0.8
         } else {
@@ -21,7 +21,7 @@ class HomeCell: UITableViewCell {
         }
     }
 
-    override func setSelected(selected: Bool, animated: Bool) {
+    override func setSelected(_ selected: Bool, animated: Bool) {
         if selected {
             self.sImageView.alpha = 0.8
         } else {

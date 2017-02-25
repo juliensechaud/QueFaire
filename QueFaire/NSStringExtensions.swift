@@ -10,7 +10,7 @@ import Foundation
 
 extension String {
     func capitalizingFirstLetter() -> String {
-        let first = String(characters.prefix(1)).uppercaseString
+        let first = String(characters.prefix(1)).uppercased()
         let other = String(characters.dropFirst())
         return first + other
     }

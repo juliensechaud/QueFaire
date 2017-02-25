@@ -9,7 +9,7 @@
 import UIKit
 
 class UniversCell: UITableViewCell {
-    override func setHighlighted(highlighted: Bool, animated: Bool) {
+    override func setHighlighted(_ highlighted: Bool, animated: Bool) {
         if highlighted {
             self.textLabel?.font = UIFont(name: "Avenir-Heavy", size: 14)
         } else {
@@ -17,7 +17,7 @@ class UniversCell: UITableViewCell {
         }
     }
     
-    override func setSelected(selected: Bool, animated: Bool) {
+    override func setSelected(_ selected: Bool, animated: Bool) {
         if selected {
             self.textLabel?.font = UIFont(name: "Avenir-Heavy", size: 14)
         } else {

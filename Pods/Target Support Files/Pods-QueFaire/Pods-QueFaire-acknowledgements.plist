@@ -34,6 +34,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 </string>
+			<key>License</key>
+			<string>MIT</string>
 			<key>Title</key>
 			<string>Alamofire</string>
 			<key>Type</key>
@@ -61,6 +63,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 </string>
+			<key>License</key>
+			<string>MIT</string>
 			<key>Title</key>
 			<string>AlamofireImage</string>
 			<key>Type</key>
@@ -68,8 +72,10 @@ THE SOFTWARE.
 		</dict>
 		<dict>
 			<key>FooterText</key>
-			<string>Copyright &#169; 2015 Batch.com
+			<string>Copyright © 2015 Batch.com
 </string>
+			<key>License</key>
+			<string>Custom</string>
 			<key>Title</key>
 			<string>Batch</string>
 			<key>Type</key>
@@ -78,6 +84,8 @@ THE SOFTWARE.
 		<dict>
 			<key>FooterText</key>
 			<string>Fabric: Copyright 2016 Twitter, Inc. All Rights Reserved. Use of this software is subject to the terms and conditions of the Fabric Software and Services Agreement located at https://fabric.io/terms. Crashlytics Kit: Copyright 2016 Crashlytics, Inc. All Rights Reserved. Use of this software is subject to the terms and conditions of the Crashlytics Terms of Service located at http://try.crashlytics.com/terms/terms-of-service.pdf and the Crashlytics Privacy Policy located at http://try.crashlytics.com/terms/privacy-policy.pdf. OSS: http://get.fabric.io/terms/opensource.txt</string>
+			<key>License</key>
+			<string>Commercial</string>
 			<key>Title</key>
 			<string>Crashlytics</string>
 			<key>Type</key>
@@ -86,6 +94,8 @@ THE SOFTWARE.
 		<dict>
 			<key>FooterText</key>
 			<string>Fabric: Copyright 2016 Twitter, Inc. All Rights Reserved. Use of this software is subject to the terms and conditions of the Fabric Software and Services Agreement located at https://fabric.io/terms. OSS: http://get.fabric.io/terms/opensource.txt</string>
+			<key>License</key>
+			<string>Commercial</string>
 			<key>Title</key>
 			<string>Fabric</string>
 			<key>Type</key>
@@ -95,7 +105,7 @@ THE SOFTWARE.
 			<key>FooterText</key>
 			<string>The MIT License (MIT)
 
-Copyright (c) 2015 Wei Wang
+Copyright (c) 2017 Wei Wang
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -116,6 +126,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 </string>
+			<key>License</key>
+			<string>MIT</string>
 			<key>Title</key>
 			<string>Kingfisher</string>
 			<key>Type</key>
@@ -142,6 +154,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.</string>
+			<key>License</key>
+			<string>MIT</string>
 			<key>Title</key>
 			<string>MDHTMLLabel</string>
 			<key>Type</key>
@@ -149,7 +163,7 @@ THE SOFTWARE.</string>
 		</dict>
 		<dict>
 			<key>FooterText</key>
-			<string>Copyright (c) 2015 Sergio Fern&#225;ndez &lt;fdz.sergio@gmail.com&gt;
+			<string>Copyright (c) 2015 Sergio Fernández &lt;fdz.sergio@gmail.com&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -169,6 +183,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 </string>
+			<key>License</key>
+			<string>MIT</string>
 			<key>Title</key>
 			<string>SFFocusViewLayout</string>
 			<key>Type</key>
